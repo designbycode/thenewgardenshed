@@ -115,4 +115,9 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    'owner' => [
+        'address' => env('MAIL_OWNER_ADDRESS', 'sleep@thegardenshed.co.za'),
+        'name' => env('MAIL_OWNER_NAME', env('APP_NAME', 'The Garden Shed')),
+    ],
+
 ];

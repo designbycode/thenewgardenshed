@@ -1,21 +1,9 @@
 import { Link } from '@inertiajs/react';
-import {
-    ArrowRight,
-    Bath,
-    BedDouble,
-    Eye,
-    ShieldCheck,
-    Users,
-} from 'lucide-react';
+import { ArrowRight, Bath, BedDouble, Eye, ShieldCheck, Users } from 'lucide-react';
 import placeholderRoom from '@/../images/placeholder-room.png';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardFooter,
-    CardHeader,
-} from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import rooms from '@/routes/rooms';
 import type { RoomItem } from '@/types/data';
 
@@ -24,6 +12,7 @@ export default function CardRoom({ room }: { room: RoomItem }) {
         <Card className="group flex h-full flex-col overflow-hidden py-0 transition-all duration-500">
             {/* Image with Badge and Hover effect */}
             <Link
+                prefetch={`hover`}
                 href={rooms.show(room).url}
                 className="relative aspect-video overflow-hidden"
             >
@@ -64,7 +53,7 @@ export default function CardRoom({ room }: { room: RoomItem }) {
                         <span>Breakfast Included</span>
                     </div>
                 </div>
-                <Link href={rooms.show(room).url}>
+                <Link prefetch={`hover`} href={rooms.show(room).url}>
                     <h3 className="font-serif text-xl font-normal text-foreground transition-colors group-hover:text-primary">
                         {room.name}
                     </h3>
@@ -108,6 +97,7 @@ export default function CardRoom({ room }: { room: RoomItem }) {
                     className="flex w-full space-x-1.5"
                 >
                     <Link
+                        prefetch={`hover`}
                         className="flex items-center space-x-1.5"
                         href={rooms.show(room).url}
                     >
