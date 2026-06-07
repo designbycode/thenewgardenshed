@@ -168,10 +168,13 @@ export function ImageUploadArea({ onUpload, disabled, media, roomSlug }: ImageUp
 
     function handleReorder(event: any) {
         const source = event.operation?.source;
-        if (!source) return;
+        const target = event.operation?.target;
+
+        if (!source || !target) return;
 
         const fromIdx = source.initialIndex;
-        const toIdx = source.index;
+        const toIdx = target.index;
+
         if (typeof fromIdx !== 'number' || typeof toIdx !== 'number') return;
         if (fromIdx === toIdx) return;
 
