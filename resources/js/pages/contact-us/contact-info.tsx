@@ -41,7 +41,7 @@ export default function ContactInfo() {
             />
 
             <div
-                className="mb-16 grid grid-cols-1 gap-8 lg:grid-cols-3"
+                className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-3"
                 id="contact-info-boxes"
             >
                 {contactMethods.map((method) => (

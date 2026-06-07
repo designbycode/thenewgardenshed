@@ -1,57 +1,61 @@
 import { Compass, MapPin } from 'lucide-react';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
 export default function ContactLocation() {
     return (
         <div className="space-y-6">
-            <div className="space-y-4 rounded-2xl border border-border bg-card p-5 shadow-md sm:p-6">
-                <div className="flex items-center gap-2">
-                    <MapPin size={18} className="text-primary" />
-                    <h4 className="font-serif text-lg font-light text-foreground">
-                        Our Country Location
-                    </h4>
-                </div>
-
-                <div className="space-y-1 text-xs text-muted-foreground sm:text-sm">
-                    <p className="font-semibold text-foreground">
-                        The Garden Shed
-                    </p>
-                    <p>Champagne Street, Vorentoe Farm,</p>
-                    <p>Wellington, Western Cape, 7655, South Africa</p>
-                </div>
-
-                <div className="space-y-3 border-t border-border pt-4">
-                    <div className="flex items-start gap-2.5 text-xs text-muted-foreground">
-                        <Compass
-                            size={15}
-                            className="mt-0.5 shrink-0 text-primary"
-                        />
-                        <div>
-                            <span className="block font-medium text-foreground">
-                                From Cape Town International Airport (65 km)
-                            </span>
-                            Take the N2 then switch to R300, or take the
-                            beautiful N1 highway north towards Paarl. Take the
-                            R44 Turnoff towards Wellington, then continue into
-                            Champagne Street, Vorentoe Farm.
-                        </div>
+            <Card>
+                <CardHeader>
+                    <div className="flex items-center gap-2">
+                        <MapPin size={18} className="text-primary" />
+                        <h4 className="font-serif text-lg font-light text-foreground">
+                            Our Country Location
+                        </h4>
+                    </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="space-y-1 text-xs text-muted-foreground sm:text-sm">
+                        <p className="font-semibold text-foreground">
+                            The Garden Shed
+                        </p>
+                        <p>Champagne Street, Vorentoe Farm,</p>
+                        <p>Wellington, Western Cape, 7655, South Africa</p>
                     </div>
 
-                    <div className="flex items-start gap-2.5 text-xs text-muted-foreground">
-                        <Compass
-                            size={15}
-                            className="mt-0.5 shrink-0 text-primary"
-                        />
-                        <div>
-                            <span className="block font-medium text-foreground">
-                                From Wellington Golf Course (2.5 km)
-                            </span>
-                            We are practically next door! Head northeast on
-                            Bain's Kloof Rd, turn right at Champagne Street to
-                            reach our electronic gates.
+                    <div className="space-y-3 border-t border-border pt-4">
+                        <div className="flex items-start gap-2.5 text-xs text-muted-foreground">
+                            <Compass
+                                size={15}
+                                className="mt-0.5 shrink-0 text-primary"
+                            />
+                            <div>
+                                <span className="block font-medium text-foreground">
+                                    From Cape Town International Airport (65 km)
+                                </span>
+                                Take the N2 then switch to R300, or take the
+                                beautiful N1 highway north towards Paarl. Take
+                                the R44 Turnoff towards Wellington, then
+                                continue into Champagne Street, Vorentoe Farm.
+                            </div>
+                        </div>
+
+                        <div className="flex items-start gap-2.5 text-xs text-muted-foreground">
+                            <Compass
+                                size={15}
+                                className="mt-0.5 shrink-0 text-primary"
+                            />
+                            <div>
+                                <span className="block font-medium text-foreground">
+                                    From Wellington Golf Course (2.5 km)
+                                </span>
+                                We are practically next door! Head northeast on
+                                Bain's Kloof Rd, turn right at Champagne Street
+                                to reach our electronic gates.
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                </CardContent>
+            </Card>
 
             <div className="relative flex h-64 items-center justify-center overflow-hidden rounded-2xl border border-border bg-muted p-4 text-center shadow-sm">
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/95">

@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { Form } from '@inertiajs/react';
 import { LoaderCircle, Send } from 'lucide-react';
 import InputError from '@/components/input-error';
@@ -8,10 +9,20 @@ import { Textarea } from '@/components/ui/textarea';
 import { store } from '@/routes/contact-us';
 
 export default function ContactForm() {
+    const scrollRef = useRef(0);
+
     return (
         <Form
             {...store.form()}
             resetOnSuccess={['name', 'email', 'subject', 'message']}
+            onBefore={() => {
+                scrollRef.current = window.scrollY;
+            }}
+            onFinish={() => {
+                requestAnimationFrame(() => {
+                    window.scrollTo(0, scrollRef.current);
+                });
+            }}
             className="space-y-4"
         >
             {({ processing, errors }) => (
@@ -91,7 +102,9 @@ export default function ContactForm() {
                         ) : (
                             <Send size={14} />
                         )}
-                        <span>{processing ? 'Sending...' : 'Send Message'}</span>
+                        <span>
+                            {processing ? 'Sending...' : 'Send Message'}
+                        </span>
                     </Button>
                 </>
             )}

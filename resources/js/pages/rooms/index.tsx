@@ -71,12 +71,6 @@ export default function RoomsIndex({ rooms }: { rooms: RoomItem[] }) {
             <motion.div
                 className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
                 id="rooms-card-grid"
-                initial="hidden"
-                animate="visible"
-                variants={{
-                    hidden: {},
-                    visible: { transition: { staggerChildren: 0.08 } },
-                }}
             >
                 {filteredRooms.map((room: RoomItem) => (
                     <motion.div key={room.id}>
