@@ -4,6 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Amenity;
+use App\Http\Requests\Admin\ReorderImagesRequest;
+use App\Http\Requests\Admin\StoreRoomRequest;
+use App\Http\Requests\Admin\UpdateRoomRequest;
+use App\Http\Requests\Admin\UploadImageRequest;
 use App\Models\Room;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -109,22 +113,9 @@ class RoomController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreRoomRequest $request)
     {
-        $validated = $request->validate([
-            'slug' => ['required', 'string', 'max:255', 'unique:rooms,slug'],
-            'name' => ['required', 'string', 'max:255'],
-            'type' => ['required', 'string', 'in:luxury,standard,cozy'],
-            'description' => ['required', 'string'],
-            'short_description' => ['required', 'string', 'max:255'],
-            'blockquote' => ['nullable', 'string', 'max:65535'],
-            'price_per_night' => ['required', 'numeric', 'min:0'],
-            'capacity' => ['required', 'integer', 'min:1'],
-            'bed_type' => ['required', 'string', 'max:255'],
-            'bathroom_type' => ['required', 'string', 'max:255'],
-            'amenity_ids' => ['nullable', 'array'],
-            'amenity_ids.*' => ['exists:amenities,id'],
-        ]);
+        $validated = $request->validated();
 
         $room = Room::create([
             'slug' => $validated['slug'],
@@ -159,22 +150,9 @@ class RoomController extends Controller
         ]);
     }
 
-    public function update(Request $request, Room $room)
+    public function update(UpdateRoomRequest $request, Room $room)
     {
-        $validated = $request->validate([
-            'slug' => ['required', 'string', 'max:255', 'unique:rooms,slug,'.$room->id],
-            'name' => ['required', 'string', 'max:255'],
-            'type' => ['required', 'string', 'in:luxury,standard,cozy'],
-            'description' => ['required', 'string'],
-            'short_description' => ['required', 'string', 'max:255'],
-            'blockquote' => ['nullable', 'string', 'max:65535'],
-            'price_per_night' => ['required', 'numeric', 'min:0'],
-            'capacity' => ['required', 'integer', 'min:1'],
-            'bed_type' => ['required', 'string', 'max:255'],
-            'bathroom_type' => ['required', 'string', 'max:255'],
-            'amenity_ids' => ['nullable', 'array'],
-            'amenity_ids.*' => ['exists:amenities,id'],
-        ]);
+        $validated = $request->validated();
 
         $room->update([
             'slug' => $validated['slug'],
@@ -193,11 +171,7 @@ class RoomController extends Controller
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Room updated.']);
 
-        return Inertia::render('admin/rooms/edit', [
-            'room' => $this->mapRoom($room->fresh()),
-            'amenities' => $this->mapAmenities(),
-            'media' => $this->mapMedia($room),
-        ]);
+        return redirect()->route('admin.rooms.edit', $room->fresh());
     }
 
     public function destroy(Room $room)
@@ -211,43 +185,28 @@ class RoomController extends Controller
         return redirect()->route('admin.rooms.index');
     }
 
-    public function uploadImage(Request $request, Room $room)
+    public function uploadImage(UploadImageRequest $request, Room $room)
     {
-        $validated = $request->validate([
-            'image' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:10240'],
-        ]);
+        $validated = $request->validated();
 
         $room->addMedia($validated['image'])->toMediaCollection('images');
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Image uploaded.']);
 
-        return Inertia::render('admin/rooms/edit', [
-            'room' => $this->mapRoom($room),
-            'amenities' => $this->mapAmenities(),
-            'media' => $this->mapMedia($room),
-        ]);
+        return redirect()->route('admin.rooms.edit', $room);
     }
 
-    public function reorderImages(Request $request, Room $room)
+    public function reorderImages(ReorderImagesRequest $request, Room $room)
     {
-        $validated = $request->validate([
-            'media_ids' => ['required', 'array'],
-            'media_ids.*' => ['integer', 'exists:media,id'],
-        ]);
+        $validated = $request->validated();
 
         foreach ($validated['media_ids'] as $index => $mediaId) {
             Media::where('id', $mediaId)->update(['order_column' => $index + 1]);
         }
 
-        $room->unsetRelation('media');
-
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Images reordered.']);
 
-        return Inertia::render('admin/rooms/edit', [
-            'room' => $this->mapRoom($room),
-            'amenities' => $this->mapAmenities(),
-            'media' => $this->mapMedia($room),
-        ]);
+        return redirect()->route('admin.rooms.edit', $room);
     }
 
     public function deleteImage(Room $room, Media $media)
@@ -256,10 +215,6 @@ class RoomController extends Controller
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Image deleted.']);
 
-        return Inertia::render('admin/rooms/edit', [
-            'room' => $this->mapRoom($room),
-            'amenities' => $this->mapAmenities(),
-            'media' => $this->mapMedia($room),
-        ]);
+        return redirect()->route('admin.rooms.edit', $room);
     }
 }
