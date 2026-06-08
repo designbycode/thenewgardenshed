@@ -1,3 +1,4 @@
+import { Link } from '@inertiajs/react';
 import { Menu } from 'lucide-react';
 import logo from '@/../images/logo-banner.svg';
 import { Button } from '@/components/ui/button';
@@ -6,7 +7,6 @@ import MainWrapper from '@/layouts/main/main-wrapper';
 import MainNavigationLinks from '@/layouts/main/navigation/main-navigation-links';
 import MainThemeToggle from '@/layouts/main/navigation/main-theme-toggle';
 import MainTopNavigation from '@/layouts/main/navigation/main-top-navigation';
-import { Link } from '@inertiajs/react';
 
 export default function MainNavigation() {
     return (

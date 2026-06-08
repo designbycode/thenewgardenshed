@@ -1,5 +1,5 @@
-import HeadingBlock from '@/components/typography/heading-block';
 import { Award } from 'lucide-react';
+import HeadingBlock from '@/components/typography/heading-block';
 
 export default function InfoBoxRoom() {
     return (

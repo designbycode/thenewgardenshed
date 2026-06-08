@@ -1,12 +1,12 @@
 import { Coffee, Flame, ShieldCheck, Sparkles, UtensilsCrossed, Waves, Wifi, Wind } from 'lucide-react';
 import Breakfast from '@/../images/farm_breakfast.png';
+import Pool from '@/../images/pool.jpg';
 import HeadingBlock from '@/components/typography/heading-block';
 import { Card, CardContent } from '@/components/ui/card';
 import { AMENITIES_DATA } from '@/data/amenities-data';
 import MainWrapper from '@/layouts/main/main-wrapper';
 import MainLayout from '@/layouts/main-layout';
 
-import Pool from '@/../images/pool.jpg';
 
 export default function FacilitiesIndex() {
     const renderIcon = (iconName: string, size = 22) => {

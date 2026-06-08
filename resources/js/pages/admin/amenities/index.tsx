@@ -100,6 +100,7 @@ export default function AdminAmenitiesIndex({
     useEffect(() => {
         if (isFirstRender.current) {
             isFirstRender.current = false;
+
             return;
         }
 

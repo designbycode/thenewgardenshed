@@ -1,12 +1,12 @@
 import { motion } from 'motion/react';
 import { useState } from 'react';
 import CardRoom from '@/components/rooms/card-room';
+import InfoBoxRoom from '@/components/rooms/info-box-room';
 import HeadingBlock from '@/components/typography/heading-block';
 import { Button } from '@/components/ui/button';
 import MainWrapper from '@/layouts/main/main-wrapper';
 import MainLayout from '@/layouts/main-layout';
 import type { RoomItem } from '@/types/data';
-import InfoBoxRoom from '@/components/rooms/info-box-room';
 
 export default function RoomsIndex({ rooms }: { rooms: RoomItem[] }) {
     const [filter, setFilter] = useState<

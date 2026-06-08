@@ -71,6 +71,7 @@ const columns = [
                 standard: 'Standard',
                 cozy: 'Cozy',
             };
+
             return (
                 <Badge variant="outline">{map[getValue()] ?? getValue()}</Badge>
             );
@@ -143,6 +144,7 @@ export default function AdminRoomsIndex({
     useEffect(() => {
         if (isFirstRender.current) {
             isFirstRender.current = false;
+
             return;
         }
 
