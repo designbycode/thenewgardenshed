@@ -22,13 +22,15 @@ const mainNavItems: NavItem[] = [
         href: dashboard(),
         icon: LayoutGrid,
     },
-];
-
-const adminNavItems: NavItem[] = [
     {
         title: 'Rooms',
         href: '/admin/rooms',
         icon: DoorOpen,
+    },
+    {
+        title: 'Amenities',
+        href: '/admin/amenities',
+        icon: BookOpen,
     },
 ];
 
@@ -62,7 +64,6 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={mainNavItems} />
-                <NavMain label="Admin" items={adminNavItems} />
             </SidebarContent>
 
             <SidebarFooter>

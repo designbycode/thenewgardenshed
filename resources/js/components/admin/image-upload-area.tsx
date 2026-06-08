@@ -1,8 +1,8 @@
-import { GripVertical, Trash2, Upload } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import { DragDropProvider } from '@dnd-kit/react';
 import { useSortable } from '@dnd-kit/react/sortable';
 import { router } from '@inertiajs/react';
+import { GripVertical, Trash2, Upload } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
@@ -89,19 +89,18 @@ export function ImageUploadArea({ onUpload, disabled, media, roomSlug }: ImageUp
     const inputRef = useRef<HTMLInputElement>(null);
     const wasDisabled = useRef(disabled);
 
-    useEffect(() => {
-        if (media) {
-            setLocalMedia(media);
-        }
-    }, [media]);
+    if (media && media !== localMedia && !isDragging) {
+        setLocalMedia(media);
+    }
 
     useEffect(() => {
         if (wasDisabled.current && !disabled) {
             pendingFiles.forEach((f) => URL.revokeObjectURL(f.preview));
             setPendingFiles([]);
         }
+
         wasDisabled.current = disabled;
-    }, [disabled]);
+    }, [disabled, pendingFiles]);
 
     const addFiles = useCallback(
         (files: File[]) => {
@@ -119,9 +118,11 @@ export function ImageUploadArea({ onUpload, disabled, media, roomSlug }: ImageUp
     const handleInput = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             const files = Array.from(e.target.files || []);
+
             if (files.length > 0) {
                 addFiles(files);
             }
+
             e.target.value = '';
         },
         [addFiles],
@@ -131,6 +132,7 @@ export function ImageUploadArea({ onUpload, disabled, media, roomSlug }: ImageUp
         e.preventDefault();
         e.stopPropagation();
         dragCounter.current++;
+
         if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
             setIsDragging(true);
         }
@@ -140,6 +142,7 @@ export function ImageUploadArea({ onUpload, disabled, media, roomSlug }: ImageUp
         e.preventDefault();
         e.stopPropagation();
         dragCounter.current--;
+
         if (dragCounter.current === 0) {
             setIsDragging(false);
         }
@@ -159,6 +162,7 @@ export function ImageUploadArea({ onUpload, disabled, media, roomSlug }: ImageUp
             const files = Array.from(e.dataTransfer.files).filter((f) =>
                 ACCEPTED_TYPES.includes(f.type),
             );
+
             if (files.length > 0) {
                 addFiles(files);
             }
@@ -170,16 +174,26 @@ export function ImageUploadArea({ onUpload, disabled, media, roomSlug }: ImageUp
         const source = event.operation?.source;
         const target = event.operation?.target;
 
-        if (!source || !target) return;
+        if (!source || !target) {
+return;
+}
 
         const fromIdx = source.initialIndex;
         const toIdx = target.index;
 
-        if (typeof fromIdx !== 'number' || typeof toIdx !== 'number') return;
-        if (fromIdx === toIdx) return;
+        if (typeof fromIdx !== 'number' || typeof toIdx !== 'number') {
+return;
+}
+
+        if (fromIdx === toIdx) {
+return;
+}
 
         const items = [...localMedia];
-        if (fromIdx < 0 || fromIdx >= items.length || toIdx < 0 || toIdx >= items.length) return;
+
+        if (fromIdx < 0 || fromIdx >= items.length || toIdx < 0 || toIdx >= items.length) {
+return;
+}
 
         const [moved] = items.splice(fromIdx, 1);
         items.splice(toIdx, 0, moved);
@@ -195,7 +209,9 @@ export function ImageUploadArea({ onUpload, disabled, media, roomSlug }: ImageUp
     }
 
     function handleDelete(mediaId: number) {
-        if (!confirm('Delete this image?')) return;
+        if (!confirm('Delete this image?')) {
+return;
+}
 
         if (roomSlug) {
             router.delete(`/admin/rooms/${roomSlug}/images/${mediaId}`, {

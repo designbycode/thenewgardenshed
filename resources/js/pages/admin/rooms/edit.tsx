@@ -1,7 +1,8 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
-import { ImageUploadArea, type MediaItem } from '@/components/admin/image-upload-area';
+import { ImageUploadArea  } from '@/components/admin/image-upload-area';
+import type {MediaItem} from '@/components/admin/image-upload-area';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -70,6 +71,7 @@ export default function AdminRoomsEdit({
         function uploadNext(index: number) {
             if (index >= files.length) {
                 setUploading(false);
+
                 return;
             }
 
