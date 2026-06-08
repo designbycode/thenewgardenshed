@@ -8,9 +8,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-#[Fillable(['slug', 'name', 'description', 'icon', 'display_order'])]
 class Amenity extends Model
 {
+    protected $fillable = ['slug', 'name', 'description', 'icon', 'display_order'];
+
     /** @use HasFactory<AmenityFactory> */
     use HasFactory;
 

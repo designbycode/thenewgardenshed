@@ -3,29 +3,22 @@ import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '
 import { Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import Heading from '@/components/heading';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { dashboard } from '@/routes';
 
-type RoomRow = {
+type AmenityRow = {
     id: number;
     slug: string;
     name: string;
-    type: 'luxury' | 'standard' | 'cozy';
-    price_per_night: number;
-    capacity: number;
-    bed_type: string;
-    bathroom_type: string;
-    short_description: string;
-    thumbnail: string;
-    images_count: number;
+    icon: string | null;
+    display_order: number;
     created_at: string;
 };
 
-type PaginatedRooms = {
-    data: RoomRow[];
+type PaginatedAmenities = {
+    data: AmenityRow[];
     current_page: number;
     from: number;
     last_page: number;
@@ -36,63 +29,28 @@ type PaginatedRooms = {
     links: { url: string | null; label: string; active: boolean }[];
 };
 
-const columnHelper = createColumnHelper<RoomRow>();
+const columnHelper = createColumnHelper<AmenityRow>();
 
 const columns = [
-    columnHelper.accessor('thumbnail', {
-        header: '',
-        cell: ({ getValue }) =>
-            getValue() ? (
-                <img
-                    src={getValue()}
-                    alt=""
-                    className="size-10 rounded object-cover"
-                />
-            ) : (
-                <div className="size-10 rounded bg-muted" />
-            ),
-    }),
     columnHelper.accessor('name', {
         header: 'Name',
         cell: ({ row, getValue }) => (
             <Link
-                href={`/admin/rooms/${row.original.slug}`}
+                href={`/admin/amenities/${row.original.slug}/edit`}
                 className="font-medium underline-offset-2 hover:underline"
             >
                 {getValue()}
             </Link>
         ),
     }),
-    columnHelper.accessor('type', {
-        header: 'Type',
-        cell: ({ getValue }) => {
-            const map: Record<string, string> = {
-                luxury: 'Luxury',
-                standard: 'Standard',
-                cozy: 'Cozy',
-            };
-            return (
-                <Badge variant="outline">{map[getValue()] ?? getValue()}</Badge>
-            );
-        },
+    columnHelper.accessor('slug', {
+        header: 'Slug',
     }),
-    columnHelper.accessor('price_per_night', {
-        header: 'Price / Night',
-        cell: ({ getValue }) => `$${Number(getValue()).toFixed(2)}`,
+    columnHelper.accessor('icon', {
+        header: 'Icon',
     }),
-    columnHelper.accessor('capacity', {
-        header: 'Capacity',
-        cell: ({ getValue }) => `${getValue()} guests`,
-    }),
-    columnHelper.accessor('bed_type', {
-        header: 'Bed',
-    }),
-    columnHelper.accessor('bathroom_type', {
-        header: 'Bathroom',
-    }),
-    columnHelper.accessor('images_count', {
-        header: 'Images',
-        cell: ({ getValue }) => getValue(),
+    columnHelper.accessor('display_order', {
+        header: 'Order',
     }),
     columnHelper.accessor('created_at', {
         header: 'Created',
@@ -103,7 +61,7 @@ const columns = [
         cell: ({ row }) => (
             <div className="flex items-center gap-1">
                 <Button variant="ghost" size="icon" asChild>
-                    <Link href={`/admin/rooms/${row.original.slug}`}>
+                    <Link href={`/admin/amenities/${row.original.slug}/edit`}>
                         <Pencil className="size-4" />
                     </Link>
                 </Button>
@@ -111,8 +69,8 @@ const columns = [
                     variant="ghost"
                     size="icon"
                     onClick={() => {
-                        if (confirm('Delete this room?')) {
-                            router.delete(`/admin/rooms/${row.original.slug}`);
+                        if (confirm('Delete this amenity?')) {
+                            router.delete(`/admin/amenities/${row.original.slug}`);
                         }
                     }}
                 >
@@ -123,19 +81,18 @@ const columns = [
     }),
 ];
 
-export default function AdminRoomsIndex({
-    rooms,
+export default function AdminAmenitiesIndex({
+    amenities,
     filters,
 }: {
-    rooms: PaginatedRooms;
-    filters: { search?: string; type?: string; capacity?: string };
+    amenities: PaginatedAmenities;
+    filters: { search?: string };
 }) {
     const [search, setSearch] = useState(filters.search ?? '');
-    const [typeFilter, setTypeFilter] = useState(filters.type ?? '');
     const isFirstRender = useRef(true);
 
     const table = useReactTable({
-        data: rooms.data,
+        data: amenities.data,
         columns,
         getCoreRowModel: getCoreRowModel(),
     });
@@ -148,10 +105,9 @@ export default function AdminRoomsIndex({
 
         const timer = setTimeout(() => {
             router.get(
-                '/admin/rooms',
+                '/admin/amenities',
                 {
                     ...(search ? { search } : {}),
-                    ...(typeFilter ? { type: typeFilter } : {}),
                 },
                 {
                     preserveState: true,
@@ -162,22 +118,22 @@ export default function AdminRoomsIndex({
         }, 300);
 
         return () => clearTimeout(timer);
-    }, [search, typeFilter]);
+    }, [search]);
 
     return (
         <>
-            <Head title="Admin Rooms" />
+            <Head title="Admin Amenities" />
 
             <div className="flex flex-col gap-6 p-4 pt-0">
                 <div className="flex items-center justify-between">
                     <Heading
-                        title="Rooms"
-                        description="Manage your room inventory"
+                        title="Amenities"
+                        description="Manage room amenities"
                     />
                     <Button asChild>
-                        <Link href="/admin/rooms/create">
+                        <Link href="/admin/amenities/create">
                             <Plus className="size-4" />
-                            Create Room
+                            Create Amenity
                         </Link>
                     </Button>
                 </div>
@@ -186,22 +142,12 @@ export default function AdminRoomsIndex({
                     <div className="relative flex-1">
                         <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
-                            placeholder="Search rooms..."
+                            placeholder="Search amenities..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             className="pl-9"
                         />
                     </div>
-                    <select
-                        value={typeFilter}
-                        onChange={(e) => setTypeFilter(e.target.value)}
-                        className="flex h-9 w-40 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs"
-                    >
-                        <option value="">All types</option>
-                        <option value="luxury">Luxury</option>
-                        <option value="standard">Standard</option>
-                        <option value="cozy">Cozy</option>
-                    </select>
                 </div>
 
                 <div className="rounded-xl border">
@@ -243,7 +189,7 @@ export default function AdminRoomsIndex({
                                         colSpan={columns.length}
                                         className="h-24 text-center text-muted-foreground"
                                     >
-                                        No rooms found.
+                                        No amenities found.
                                     </TableCell>
                                 </TableRow>
                             )}
@@ -251,9 +197,9 @@ export default function AdminRoomsIndex({
                     </Table>
                 </div>
 
-                {rooms.last_page > 1 && (
+                {amenities.last_page > 1 && (
                     <div className="flex items-center justify-center gap-1">
-                        {rooms.links.map(
+                        {amenities.links.map(
                             (link: {
                                 url: string | null;
                                 label: string;
@@ -285,9 +231,9 @@ export default function AdminRoomsIndex({
     );
 }
 
-AdminRoomsIndex.layout = {
+AdminAmenitiesIndex.layout = {
     breadcrumbs: [
         { title: 'Dashboard', href: dashboard() },
-        { title: 'Rooms' },
+        { title: 'Amenities' },
     ],
 };
