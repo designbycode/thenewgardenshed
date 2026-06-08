@@ -16,7 +16,6 @@ interface RoomImageCarouselProps {
 export default function RoomImageCarousel({
     media,
     roomType,
-    roomName,
 }: RoomImageCarouselProps) {
     const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
 
@@ -29,7 +28,7 @@ export default function RoomImageCarousel({
             <style>{`
                 .room-carousel-main .swiper-button-next,
                 .room-carousel-main .swiper-button-prev {
-                    color: #fff;
+                    color: var(--foreground);
                     background: rgba(0,0,0,0.5);
                     width: 36px;
                     height: 36px;
@@ -47,7 +46,9 @@ export default function RoomImageCarousel({
                     left: 12px;
                 }
                 .room-carousel-thumbs .swiper-slide-thumb-active {
-                    border-color: #c5a059;
+                    border-color: var(--primary);
+                    border-width: 3px;
+                    box-shadow: 0 3px 6px rgba(0,0,0,0.5);
                 }
                 .room-carousel-main .swiper-pagination {
                     bottom: 10px;
@@ -65,7 +66,7 @@ export default function RoomImageCarousel({
                     transition: all 0.25s;
                 }
                 .room-carousel-main .swiper-pagination-bullet-active {
-                    background: #c5a059;
+                    background: var(--primary);
                     width: 32px;
                     border-radius: 9999px;
                 }
@@ -93,7 +94,7 @@ export default function RoomImageCarousel({
 
                 {roomType && (
                     <div className="absolute top-4 left-4 z-10">
-                        <div className="rounded border border-white/20 bg-black/60 px-3 py-1 text-[10px] font-semibold tracking-wider text-white capitalize dark:border-[#c5a059]/30 dark:bg-[#c5a059]/20 dark:text-primary">
+                        <div className="rounded border border-border bg-muted px-3 py-1 text-[10px] font-semibold tracking-wider text-primary capitalize">
                             {roomType} Suite
                         </div>
                     </div>
@@ -106,12 +107,12 @@ export default function RoomImageCarousel({
                     spaceBetween={10}
                     slidesPerView={Math.min(media.length, 4)}
                     watchSlidesProgress
-                    className="room-carousel-thumbs pb-0"
+                    className="room-carousel-thumbs pb-6"
                 >
                     {media.map((item) => (
                         <SwiperSlide
                             key={item.id}
-                            className="overflow-hidden rounded-lg border-2 border-transparent bg-stone-100 transition-colors dark:bg-black/35"
+                            className="overflow-hidden rounded-lg border-2 border-transparent bg-muted transition-colors"
                         >
                             <img
                                 src={item.thumb}
