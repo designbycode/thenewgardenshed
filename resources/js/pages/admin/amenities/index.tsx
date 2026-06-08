@@ -1,12 +1,23 @@
 import { Head, Link, router } from '@inertiajs/react';
+
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { dashboard } from '@/routes';
+import { destroy, edit } from '@/routes/admin/amenities';
 
 type AmenityRow = {
     id: number;
@@ -31,56 +42,6 @@ type PaginatedAmenities = {
 
 const columnHelper = createColumnHelper<AmenityRow>();
 
-const columns = [
-    columnHelper.accessor('name', {
-        header: 'Name',
-        cell: ({ row, getValue }) => (
-            <Link
-                href={`/admin/amenities/${row.original.slug}/edit`}
-                className="font-medium underline-offset-2 hover:underline"
-            >
-                {getValue()}
-            </Link>
-        ),
-    }),
-    columnHelper.accessor('slug', {
-        header: 'Slug',
-    }),
-    columnHelper.accessor('icon', {
-        header: 'Icon',
-    }),
-    columnHelper.accessor('display_order', {
-        header: 'Order',
-    }),
-    columnHelper.accessor('created_at', {
-        header: 'Created',
-        cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
-    }),
-    columnHelper.display({
-        id: 'actions',
-        cell: ({ row }) => (
-            <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon" asChild>
-                    <Link href={`/admin/amenities/${row.original.slug}/edit`}>
-                        <Pencil className="size-4" />
-                    </Link>
-                </Button>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                        if (confirm('Delete this amenity?')) {
-                            router.delete(`/admin/amenities/${row.original.slug}`);
-                        }
-                    }}
-                >
-                    <Trash2 className="size-4 text-destructive" />
-                </Button>
-            </div>
-        ),
-    }),
-];
-
 export default function AdminAmenitiesIndex({
     amenities,
     filters,
@@ -88,7 +49,83 @@ export default function AdminAmenitiesIndex({
     amenities: PaginatedAmenities;
     filters: { search?: string };
 }) {
+    const [deletingSlug, setDeletingSlug] = useState<string | null>(null);
     const [search, setSearch] = useState(filters.search ?? '');
+
+    const columns = [
+        columnHelper.accessor('name', {
+            header: 'Name',
+            cell: ({ row, getValue }) => (
+                <Link
+                    prefetch={true}
+                    href={edit(row.original.slug)}
+                    className="font-medium underline-offset-2 hover:underline"
+                >
+                    {getValue()}
+                </Link>
+            ),
+        }),
+        columnHelper.accessor('slug', {
+            header: 'Slug',
+        }),
+        columnHelper.accessor('icon', {
+            header: 'Icon',
+        }),
+        columnHelper.accessor('display_order', {
+            header: 'Order',
+        }),
+        columnHelper.accessor('created_at', {
+            header: 'Created',
+            cell: ({ getValue }) => new Date(getValue()).toLocaleDateString('en-US'),
+        }),
+        columnHelper.display({
+            id: 'actions',
+            cell: ({ row }) => (
+                <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="icon" asChild>
+                        <Link prefetch={true} href={edit(row.original.slug)}>
+                            <Pencil className="size-4" />
+                        </Link>
+                    </Button>
+                    <Dialog
+                        open={deletingSlug === row.original.slug}
+                        onOpenChange={(open) => !open && setDeletingSlug(null)}
+                    >
+                        <DialogTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setDeletingSlug(row.original.slug)}
+                            >
+                                <Trash2 className="size-4 text-destructive" />
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogTitle>Delete amenity</DialogTitle>
+                            <DialogDescription>
+                                Are you sure you want to delete "{row.original.name}"? This
+                                action cannot be undone.
+                            </DialogDescription>
+                            <DialogFooter className="gap-2">
+                                <DialogClose asChild>
+                                    <Button variant="secondary">Cancel</Button>
+                                </DialogClose>
+                                <Button
+                                    variant="destructive"
+                                onClick={() => {
+                                    router.delete(destroy(row.original.slug).url);
+                                    setDeletingSlug(null);
+                                }}
+                                >
+                                    Delete amenity
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </div>
+            ),
+        }),
+    ];
     const isFirstRender = useRef(true);
 
     const table = useReactTable({

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { dashboard } from '@/routes';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 type RoomRow = {
     id: number;
@@ -38,92 +39,6 @@ type PaginatedRooms = {
 
 const columnHelper = createColumnHelper<RoomRow>();
 
-const columns = [
-    columnHelper.accessor('thumbnail', {
-        header: '',
-        cell: ({ getValue }) =>
-            getValue() ? (
-                <img
-                    src={getValue()}
-                    alt=""
-                    className="size-10 rounded object-cover"
-                />
-            ) : (
-                <div className="size-10 rounded bg-muted" />
-            ),
-    }),
-    columnHelper.accessor('name', {
-        header: 'Name',
-        cell: ({ row, getValue }) => (
-            <Link
-                href={`/admin/rooms/${row.original.slug}`}
-                className="font-medium underline-offset-2 hover:underline"
-            >
-                {getValue()}
-            </Link>
-        ),
-    }),
-    columnHelper.accessor('type', {
-        header: 'Type',
-        cell: ({ getValue }) => {
-            const map: Record<string, string> = {
-                luxury: 'Luxury',
-                standard: 'Standard',
-                cozy: 'Cozy',
-            };
-
-            return (
-                <Badge variant="outline">{map[getValue()] ?? getValue()}</Badge>
-            );
-        },
-    }),
-    columnHelper.accessor('price_per_night', {
-        header: 'Price / Night',
-        cell: ({ getValue }) => `$${Number(getValue()).toFixed(2)}`,
-    }),
-    columnHelper.accessor('capacity', {
-        header: 'Capacity',
-        cell: ({ getValue }) => `${getValue()} guests`,
-    }),
-    columnHelper.accessor('bed_type', {
-        header: 'Bed',
-    }),
-    columnHelper.accessor('bathroom_type', {
-        header: 'Bathroom',
-    }),
-    columnHelper.accessor('images_count', {
-        header: 'Images',
-        cell: ({ getValue }) => getValue(),
-    }),
-    columnHelper.accessor('created_at', {
-        header: 'Created',
-        cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
-    }),
-    columnHelper.display({
-        id: 'actions',
-        cell: ({ row }) => (
-            <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon" asChild>
-                    <Link href={`/admin/rooms/${row.original.slug}`}>
-                        <Pencil className="size-4" />
-                    </Link>
-                </Button>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                        if (confirm('Delete this room?')) {
-                            router.delete(`/admin/rooms/${row.original.slug}`);
-                        }
-                    }}
-                >
-                    <Trash2 className="size-4 text-destructive" />
-                </Button>
-            </div>
-        ),
-    }),
-];
-
 export default function AdminRoomsIndex({
     rooms,
     filters,
@@ -133,7 +48,127 @@ export default function AdminRoomsIndex({
 }) {
     const [search, setSearch] = useState(filters.search ?? '');
     const [typeFilter, setTypeFilter] = useState(filters.type ?? '');
+    const [deletingSlug, setDeletingSlug] = useState<string | null>(null);
     const isFirstRender = useRef(true);
+
+    const columns = [
+        columnHelper.accessor('thumbnail', {
+            header: '',
+            cell: ({ getValue }) =>
+                getValue() ? (
+                    <img
+                        src={getValue()}
+                        alt=""
+                        className="size-10 rounded object-cover"
+                    />
+                ) : (
+                    <div className="size-10 rounded bg-muted" />
+                ),
+        }),
+        columnHelper.accessor('name', {
+            header: 'Name',
+            cell: ({ row, getValue }) => (
+                <Link
+                    href={`/admin/rooms/${row.original.slug}`}
+                    className="font-medium underline-offset-2 hover:underline"
+                >
+                    {getValue()}
+                </Link>
+            ),
+        }),
+        columnHelper.accessor('type', {
+            header: 'Type',
+            cell: ({ getValue }) => {
+                const map: Record<string, string> = {
+                    luxury: 'Luxury',
+                    standard: 'Standard',
+                    cozy: 'Cozy',
+                };
+
+                return (
+                    <Badge variant="outline">{map[getValue()] ?? getValue()}</Badge>
+                );
+            },
+        }),
+        columnHelper.accessor('price_per_night', {
+            header: 'Price / Night',
+            cell: ({ getValue }) => `$${Number(getValue()).toFixed(2)}`,
+        }),
+        columnHelper.accessor('capacity', {
+            header: 'Capacity',
+            cell: ({ getValue }) => `${getValue()} guests`,
+        }),
+        columnHelper.accessor('bed_type', {
+            header: 'Bed',
+        }),
+        columnHelper.accessor('bathroom_type', {
+            header: 'Bathroom',
+        }),
+        columnHelper.accessor('images_count', {
+            header: 'Images',
+            cell: ({ getValue }) => getValue(),
+        }),
+        columnHelper.accessor('created_at', {
+            header: 'Created',
+            cell: ({ getValue }) => new Date(getValue()).toLocaleDateString('en-US'),
+        }),
+        columnHelper.display({
+            id: 'actions',
+            cell: ({ row }) => (
+                <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="icon" asChild>
+                        <Link href={`/admin/rooms/${row.original.slug}`}>
+                            <Pencil className="size-4" />
+                        </Link>
+                    </Button>
+                    <Dialog
+                        open={deletingSlug === row.original.slug}
+                        onOpenChange={(open) => {
+                            if (!open) setDeletingSlug(null);
+                        }}
+                    >
+                        <DialogTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() =>
+                                    setDeletingSlug(row.original.slug)
+                                }
+                            >
+                                <Trash2 className="size-4 text-destructive" />
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Delete room</DialogTitle>
+                                <DialogDescription>
+                                    Are you sure you want to delete{' '}
+                                    <strong>{row.original.name}</strong>? This
+                                    action cannot be undone.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button variant="secondary">Cancel</Button>
+                                </DialogClose>
+                                <Button
+                                    variant="destructive"
+                                    onClick={() => {
+                                        router.delete(
+                                            `/admin/rooms/${row.original.slug}`,
+                                        );
+                                        setDeletingSlug(null);
+                                    }}
+                                >
+                                    Delete room
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </div>
+            ),
+        }),
+    ];
 
     const table = useReactTable({
         data: rooms.data,

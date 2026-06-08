@@ -1,12 +1,12 @@
-import { Link } from '@inertiajs/react';
 import { Menu } from 'lucide-react';
-import logo from '@/../images/logo-banner.svg';
+// import logo from '@/../images/logo-banner.svg';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import MainWrapper from '@/layouts/main/main-wrapper';
 import MainNavigationLinks from '@/layouts/main/navigation/main-navigation-links';
 import MainThemeToggle from '@/layouts/main/navigation/main-theme-toggle';
 import MainTopNavigation from '@/layouts/main/navigation/main-top-navigation';
+import MainNavigationBrand from '@/layouts/main/brand/main-navigation-brand';
 
 export default function MainNavigation() {
     return (
@@ -15,18 +15,18 @@ export default function MainNavigation() {
             <MainWrapper
                 className={'relative flex h-20 items-center justify-between'}
             >
-                {/*<MainNavigationBrand />*/}
-                <Link
-                    href="/"
-                    prefetch={true}
-                    className="relative top-9 h-40 w-39 rounded-b-[50%]"
-                >
-                    <img
-                        src={logo}
-                        alt="The New Garden Shed"
-                        className="drop-shadow-xl drop-shadow-black/25"
-                    />
-                </Link>
+                <MainNavigationBrand />
+                {/*<Link*/}
+                {/*    href="/"*/}
+                {/*    prefetch={true}*/}
+                {/*    className="relative top-9 h-40 w-39 rounded-b-[50%]"*/}
+                {/*>*/}
+                {/*    <img*/}
+                {/*        src={logo}*/}
+                {/*        alt="The New Garden Shed"*/}
+                {/*        className="drop-shadow-xl drop-shadow-black/25"*/}
+                {/*    />*/}
+                {/*</Link>*/}
 
                 <MainNavigationLinks />
                 <div className="flex items-center gap-2 lg:hidden">

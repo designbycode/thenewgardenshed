@@ -10,7 +10,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('amenities', [AmenityController::class, 'index'])->name('amenities.index');
     Route::get('amenities/create', [AmenityController::class, 'create'])->name('amenities.create');
     Route::post('amenities', [AmenityController::class, 'store'])->name('amenities.store');
-    Route::get('amenities/{amenity}', [AmenityController::class, 'edit'])->name('amenities.edit');
+    Route::get('amenities/{amenity}/edit', [AmenityController::class, 'edit'])->name('amenities.edit');
     Route::put('amenities/{amenity}', [AmenityController::class, 'update'])->name('amenities.update');
     Route::delete('amenities/{amenity}', [AmenityController::class, 'destroy'])->name('amenities.destroy');
 

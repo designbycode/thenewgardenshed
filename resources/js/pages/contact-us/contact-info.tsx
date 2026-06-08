@@ -1,21 +1,27 @@
 import { Clock, Mail, Phone } from 'lucide-react';
+import ClockImage from '@/../images/clocks.webp';
+import EmailImage from '@/../images/mail.webp';
+import PhoneImage from '@/../images/old-phone.webp';
 import HeadingBlock from '@/components/typography/heading-block';
 import ContactCard from './contact-card';
 
 const contactMethods = [
     {
+        image: PhoneImage,
         icon: Phone,
         label: 'Direct Mobile',
         value: '+27 (0)82 300 5290',
         subText: 'Available on WhatsApp & Calls',
     },
     {
+        image: EmailImage,
         icon: Mail,
         label: 'Direct Email',
         value: 'sleep@thegardenshed.co.za',
         subText: 'Typically replies in under 2 hours',
     },
     {
+        image: ClockImage,
         icon: Clock,
         label: 'Check-In Times',
         value: 'Check-In: 14:00 - 19:00',
