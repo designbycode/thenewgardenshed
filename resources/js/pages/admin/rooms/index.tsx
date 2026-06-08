@@ -139,6 +139,25 @@ export default function AdminRoomsIndex({
         getCoreRowModel: getCoreRowModel(),
     });
 
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            if (
+                search !== (filters.search ?? '') ||
+                typeFilter !== (filters.type ?? '')
+            ) {
+                router.get(
+                    '/admin/rooms',
+                    {
+                        ...(search ? { search } : {}),
+                        ...(typeFilter ? { type: typeFilter } : {}),
+                    },
+                    { preserveState: true, preserveScroll: true },
+                );
+            }
+        }, 300);
+        return () => clearTimeout(timeout);
+    }, [search, typeFilter]);
+
     function applyFilters() {
         router.get(
             '/admin/rooms',
@@ -203,9 +222,6 @@ export default function AdminRoomsIndex({
                         <option value="standard">Standard</option>
                         <option value="cozy">Cozy</option>
                     </select>
-                    <Button variant="secondary" onClick={applyFilters}>
-                        Search
-                    </Button>
                 </div>
 
                 <div className="rounded-xl border">

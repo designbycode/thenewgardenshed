@@ -12,13 +12,28 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-#[Fillable(['slug', 'name', 'type', 'description', 'short_description', 'blockquote', 'price_per_night', 'capacity', 'bed_type', 'bathroom_type', 'max_guests', 'number_of_beds', 'is_active'])]
 class Room extends Model implements HasMedia
 {
     /** @use HasFactory<RoomFactory> */
     use HasFactory;
 
     use InteractsWithMedia;
+
+    protected $fillable = [
+        'slug',
+        'name',
+        'type',
+        'description',
+        'short_description',
+        'blockquote',
+        'price_per_night',
+        'capacity',
+        'bed_type',
+        'bathroom_type',
+        'max_guests',
+        'number_of_beds',
+        'is_active',
+    ];
 
     public function getRouteKeyName(): string
     {

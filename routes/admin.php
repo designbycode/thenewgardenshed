@@ -1,10 +1,13 @@
 <?php
 
+use App\Http\Controllers\Admin\AmenityController;
 use App\Http\Controllers\Admin\RoomController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
     Route::redirect('/', '/admin/rooms');
+
+    Route::resource('amenities', AmenityController::class)->except(['show']);
 
     Route::get('rooms', [RoomController::class, 'index'])->name('rooms.index');
     Route::get('rooms/create', [RoomController::class, 'create'])->name('rooms.create');

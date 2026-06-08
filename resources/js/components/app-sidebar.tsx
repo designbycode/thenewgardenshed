@@ -22,15 +22,19 @@ const mainNavItems: NavItem[] = [
         href: dashboard(),
         icon: LayoutGrid,
     },
-];
-
-const adminNavItems: NavItem[] = [
     {
         title: 'Rooms',
         href: '/admin/rooms',
         icon: DoorOpen,
     },
+    {
+        title: 'Amenities',
+        href: '/admin/amenities',
+        icon: BookOpen,
+    },
 ];
+
+const adminNavItems: NavItem[] = [];
 
 const footerNavItems: NavItem[] = [
     {

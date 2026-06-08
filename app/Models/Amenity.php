@@ -8,11 +8,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-#[Fillable(['slug', 'name', 'description', 'icon', 'display_order'])]
 class Amenity extends Model
 {
     /** @use HasFactory<AmenityFactory> */
     use HasFactory;
+
+    protected $fillable = [
+        'slug',
+        'name',
+        'description',
+        'icon',
+        'display_order',
+    ];
 
 
     public function getRouteKeyName(): string
