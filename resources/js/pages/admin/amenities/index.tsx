@@ -1,6 +1,11 @@
 import { Head, Link, router } from '@inertiajs/react';
 
-import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import {
+    createColumnHelper,
+    flexRender,
+    getCoreRowModel,
+    useReactTable,
+} from '@tanstack/react-table';
 import { Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import Heading from '@/components/heading';
@@ -15,7 +20,14 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import { dashboard } from '@/routes';
 import { destroy, edit } from '@/routes/admin/amenities';
 
@@ -76,7 +88,8 @@ export default function AdminAmenitiesIndex({
         }),
         columnHelper.accessor('created_at', {
             header: 'Created',
-            cell: ({ getValue }) => new Date(getValue()).toLocaleDateString('en-US'),
+            cell: ({ getValue }) =>
+                new Date(getValue()).toLocaleDateString('en-US'),
         }),
         columnHelper.display({
             id: 'actions',
@@ -95,7 +108,9 @@ export default function AdminAmenitiesIndex({
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => setDeletingSlug(row.original.slug)}
+                                onClick={() =>
+                                    setDeletingSlug(row.original.slug)
+                                }
                             >
                                 <Trash2 className="size-4 text-destructive" />
                             </Button>
@@ -103,8 +118,9 @@ export default function AdminAmenitiesIndex({
                         <DialogContent>
                             <DialogTitle>Delete amenity</DialogTitle>
                             <DialogDescription>
-                                Are you sure you want to delete "{row.original.name}"? This
-                                action cannot be undone.
+                                Are you sure you want to delete "
+                                {row.original.name}"? This action cannot be
+                                undone.
                             </DialogDescription>
                             <DialogFooter className="gap-2">
                                 <DialogClose asChild>
@@ -112,10 +128,12 @@ export default function AdminAmenitiesIndex({
                                 </DialogClose>
                                 <Button
                                     variant="destructive"
-                                onClick={() => {
-                                    router.delete(destroy(row.original.slug).url);
-                                    setDeletingSlug(null);
-                                }}
+                                    onClick={() => {
+                                        router.delete(
+                                            destroy(row.original.slug).url,
+                                        );
+                                        setDeletingSlug(null);
+                                    }}
                                 >
                                     Delete amenity
                                 </Button>
@@ -162,7 +180,7 @@ export default function AdminAmenitiesIndex({
         <>
             <Head title="Admin Amenities" />
 
-            <div className="flex flex-col gap-6 p-4 pt-0">
+            <div className="flex flex-col gap-6 p-4">
                 <div className="flex items-center justify-between">
                     <Heading
                         title="Amenities"

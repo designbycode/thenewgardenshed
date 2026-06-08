@@ -8,7 +8,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { dashboard } from '@/routes';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger
+} from '@/components/ui/dialog';
 
 type RoomRow = {
     id: number;
@@ -86,7 +95,9 @@ export default function AdminRoomsIndex({
                 };
 
                 return (
-                    <Badge variant="outline">{map[getValue()] ?? getValue()}</Badge>
+                    <Badge variant="outline">
+                        {map[getValue()] ?? getValue()}
+                    </Badge>
                 );
             },
         }),
@@ -110,7 +121,8 @@ export default function AdminRoomsIndex({
         }),
         columnHelper.accessor('created_at', {
             header: 'Created',
-            cell: ({ getValue }) => new Date(getValue()).toLocaleDateString('en-US'),
+            cell: ({ getValue }) =>
+                new Date(getValue()).toLocaleDateString('en-US'),
         }),
         columnHelper.display({
             id: 'actions',
@@ -205,7 +217,7 @@ export default function AdminRoomsIndex({
         <>
             <Head title="Admin Rooms" />
 
-            <div className="flex flex-col gap-6 p-4 pt-0">
+            <div className="flex flex-col gap-6 p-4">
                 <div className="flex items-center justify-between">
                     <Heading
                         title="Rooms"

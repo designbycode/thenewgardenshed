@@ -1,5 +1,4 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -47,13 +46,8 @@ export default function AdminRoomsCreate({
         <>
             <Head title="Create Room" />
 
-            <div className="flex flex-col gap-6 p-4 pt-0">
+            <div className="flex flex-col gap-4 p-4">
                 <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="icon" asChild>
-                        <Link href="/admin/rooms">
-                            <ArrowLeft className="size-4" />
-                        </Link>
-                    </Button>
                     <Heading
                         title="Create Room"
                         description="Add a new room to your inventory"
@@ -126,9 +120,7 @@ export default function AdminRoomsCreate({
                                     }
                                     required
                                 />
-                                <InputError
-                                    message={errors.price_per_night}
-                                />
+                                <InputError message={errors.price_per_night} />
                             </div>
 
                             <div className="grid gap-2">
@@ -143,8 +135,12 @@ export default function AdminRoomsCreate({
                                     required
                                 >
                                     {Array.from({ length: 12 }, (_, i) => (
-                                        <option key={i + 1} value={String(i + 1)}>
-                                            {i + 1} {i === 0 ? 'Guest' : 'Guests'}
+                                        <option
+                                            key={i + 1}
+                                            value={String(i + 1)}
+                                        >
+                                            {i + 1}{' '}
+                                            {i === 0 ? 'Guest' : 'Guests'}
                                         </option>
                                     ))}
                                 </select>
@@ -181,22 +177,19 @@ export default function AdminRoomsCreate({
                                     id="bathroom_type"
                                     value={data.bathroom_type}
                                     onChange={(e) =>
-                                        setData(
-                                            'bathroom_type',
-                                            e.target.value,
-                                        )
+                                        setData('bathroom_type', e.target.value)
                                     }
                                     className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs"
                                     required
                                 >
-                                    <option value="">Select bathroom type</option>
+                                    <option value="">
+                                        Select bathroom type
+                                    </option>
                                     <option value="Private">Private</option>
                                     <option value="Shared">Shared</option>
                                     <option value="Ensuite">Ensuite</option>
                                 </select>
-                                <InputError
-                                    message={errors.bathroom_type}
-                                />
+                                <InputError message={errors.bathroom_type} />
                             </div>
                         </div>
 
@@ -208,10 +201,7 @@ export default function AdminRoomsCreate({
                                 id="short_description"
                                 value={data.short_description}
                                 onChange={(e) =>
-                                    setData(
-                                        'short_description',
-                                        e.target.value,
-                                    )
+                                    setData('short_description', e.target.value)
                                 }
                                 maxLength={255}
                                 required
@@ -257,13 +247,19 @@ export default function AdminRoomsCreate({
                                     {amenities.map((amenity) => (
                                         <label
                                             key={amenity.id}
-                                            className="flex items-center gap-2 rounded-lg border p-3 cursor-pointer hover:bg-muted/50"
+                                            className="flex cursor-pointer items-center gap-2 rounded-lg border p-3 hover:bg-muted/50"
                                         >
                                             <Checkbox
-                                                checked={data.amenity_ids.includes(amenity.id)}
-                                                onCheckedChange={() => toggleAmenity(amenity.id)}
+                                                checked={data.amenity_ids.includes(
+                                                    amenity.id,
+                                                )}
+                                                onCheckedChange={() =>
+                                                    toggleAmenity(amenity.id)
+                                                }
                                             />
-                                            <span className="text-sm">{amenity.name}</span>
+                                            <span className="text-sm">
+                                                {amenity.name}
+                                            </span>
                                         </label>
                                     ))}
                                 </div>

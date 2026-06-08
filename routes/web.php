@@ -3,6 +3,7 @@
 use App\Http\Controllers\ContactUs\ContactUsIndexController;
 use App\Http\Controllers\ContactUs\ContactUsStoreController;
 use App\Http\Controllers\Facilities\FacilitiesIndexController;
+use App\Http\Controllers\GuestBook\GuestBookIndexController;
 use App\Http\Controllers\HomeIndexController;
 use App\Http\Controllers\Rooms\RoomsIndexController;
 use App\Http\Controllers\Rooms\RoomsShowController;
@@ -12,6 +13,7 @@ Route::get('/', HomeIndexController::class)->name('home');
 Route::get('/rooms', RoomsIndexController::class)->name('rooms.index');
 Route::get('/rooms/{room:slug}', RoomsShowController::class)->name('rooms.show');
 Route::get('/facilities', FacilitiesIndexController::class)->name('facilities.index');
+Route::get('/guest-book', GuestBookIndexController::class)->name('guest-book.index');
 
 Route::get('/contact-us', ContactUsIndexController::class)->name('contact-us.index');
 Route::post('/contact-us', ContactUsStoreController::class)->name('contact-us.store');

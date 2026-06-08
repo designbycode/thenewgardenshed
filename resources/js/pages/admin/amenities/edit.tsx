@@ -33,7 +33,7 @@ export default function EditAmenity({ amenity }: { amenity: Amenity }) {
         <>
             <Head title={`Edit Amenity: ${amenity.name}`} />
 
-            <div className="flex flex-col gap-6 p-4 pt-0">
+            <div className="flex flex-col gap-6 p-4">
                 <Heading
                     title={`Edit Amenity: ${amenity.name}`}
                     description="Update room amenity details"
@@ -46,10 +46,16 @@ export default function EditAmenity({ amenity }: { amenity: Amenity }) {
                             <Input
                                 id="name"
                                 value={data.name}
-                                onChange={(e) => setData('name', e.target.value)}
+                                onChange={(e) =>
+                                    setData('name', e.target.value)
+                                }
                                 required
                             />
-                            {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+                            {errors.name && (
+                                <p className="text-sm text-destructive">
+                                    {errors.name}
+                                </p>
+                            )}
                         </div>
 
                         <div className="space-y-2">
@@ -57,10 +63,16 @@ export default function EditAmenity({ amenity }: { amenity: Amenity }) {
                             <Input
                                 id="slug"
                                 value={data.slug}
-                                onChange={(e) => setData('slug', e.target.value)}
+                                onChange={(e) =>
+                                    setData('slug', e.target.value)
+                                }
                                 required
                             />
-                            {errors.slug && <p className="text-sm text-destructive">{errors.slug}</p>}
+                            {errors.slug && (
+                                <p className="text-sm text-destructive">
+                                    {errors.slug}
+                                </p>
+                            )}
                         </div>
 
                         <div className="space-y-2">
@@ -68,9 +80,15 @@ export default function EditAmenity({ amenity }: { amenity: Amenity }) {
                             <Input
                                 id="icon"
                                 value={data.icon}
-                                onChange={(e) => setData('icon', e.target.value)}
+                                onChange={(e) =>
+                                    setData('icon', e.target.value)
+                                }
                             />
-                            {errors.icon && <p className="text-sm text-destructive">{errors.icon}</p>}
+                            {errors.icon && (
+                                <p className="text-sm text-destructive">
+                                    {errors.icon}
+                                </p>
+                            )}
                         </div>
 
                         <div className="space-y-2">
@@ -79,9 +97,18 @@ export default function EditAmenity({ amenity }: { amenity: Amenity }) {
                                 id="display_order"
                                 type="number"
                                 value={data.display_order}
-                                onChange={(e) => setData('display_order', parseInt(e.target.value))}
+                                onChange={(e) =>
+                                    setData(
+                                        'display_order',
+                                        parseInt(e.target.value),
+                                    )
+                                }
                             />
-                            {errors.display_order && <p className="text-sm text-destructive">{errors.display_order}</p>}
+                            {errors.display_order && (
+                                <p className="text-sm text-destructive">
+                                    {errors.display_order}
+                                </p>
+                            )}
                         </div>
 
                         <div className="space-y-2">
@@ -89,9 +116,15 @@ export default function EditAmenity({ amenity }: { amenity: Amenity }) {
                             <Textarea
                                 id="description"
                                 value={data.description}
-                                onChange={(e) => setData('description', e.target.value)}
+                                onChange={(e) =>
+                                    setData('description', e.target.value)
+                                }
                             />
-                            {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
+                            {errors.description && (
+                                <p className="text-sm text-destructive">
+                                    {errors.description}
+                                </p>
+                            )}
                         </div>
                     </div>
 

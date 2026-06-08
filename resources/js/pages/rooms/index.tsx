@@ -46,7 +46,7 @@ export default function RoomsIndex({ rooms }: { rooms: RoomItem[] }) {
                 id="rooms-filter-controls"
             >
                 {[
-                    { label: 'All 8 Rooms', val: 'all' },
+                    { label: `All ${rooms.length}  Rooms`, val: 'all' },
                     {
                         label: 'Luxury Suites (Free Bath + Shower)',
                         val: 'luxury',
@@ -86,4 +86,13 @@ export default function RoomsIndex({ rooms }: { rooms: RoomItem[] }) {
 
 RoomsIndex.displayName = 'RoomsIndex';
 
-RoomsIndex.layout = MainLayout;
+RoomsIndex.layout = (page: any) => (
+    <MainLayout
+        title={'Our Rooms | The New Garden Shed'}
+        description={
+            'Explore our luxury suites, standard kings, and cozy queen rooms — each with private entrance and premium amenities.'
+        }
+    >
+        {page}
+    </MainLayout>
+);

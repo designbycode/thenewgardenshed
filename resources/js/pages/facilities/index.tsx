@@ -166,4 +166,13 @@ export default function FacilitiesIndex() {
 
 FacilitiesIndex.displayName = 'FacilitiesIndex';
 
-FacilitiesIndex.layout = MainLayout;
+FacilitiesIndex.layout = (page: any) => (
+    <MainLayout
+        title={'Our Facilities | The New Garden Shed'}
+        description={
+            'Enjoy farm-fresh breakfasts, a sparkling pool, lush gardens, and premium country manor conveniences during your stay.'
+        }
+    >
+        {page}
+    </MainLayout>
+);

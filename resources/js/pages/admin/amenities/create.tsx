@@ -24,7 +24,7 @@ export default function CreateAmenity() {
         <>
             <Head title="Create Amenity" />
 
-            <div className="flex flex-col gap-6 p-4 pt-0">
+            <div className="flex flex-col gap-6 p-4">
                 <Heading
                     title="Create Amenity"
                     description="Add a new room amenity"
@@ -41,12 +41,19 @@ export default function CreateAmenity() {
                                     setData((d) => ({
                                         ...d,
                                         name: e.target.value,
-                                        slug: e.target.value.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, ''),
+                                        slug: e.target.value
+                                            .toLowerCase()
+                                            .replace(/ /g, '-')
+                                            .replace(/[^\w-]+/g, ''),
                                     }));
                                 }}
                                 required
                             />
-                            {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+                            {errors.name && (
+                                <p className="text-sm text-destructive">
+                                    {errors.name}
+                                </p>
+                            )}
                         </div>
 
                         <div className="space-y-2">
@@ -54,10 +61,16 @@ export default function CreateAmenity() {
                             <Input
                                 id="slug"
                                 value={data.slug}
-                                onChange={(e) => setData('slug', e.target.value)}
+                                onChange={(e) =>
+                                    setData('slug', e.target.value)
+                                }
                                 required
                             />
-                            {errors.slug && <p className="text-sm text-destructive">{errors.slug}</p>}
+                            {errors.slug && (
+                                <p className="text-sm text-destructive">
+                                    {errors.slug}
+                                </p>
+                            )}
                         </div>
 
                         <div className="space-y-2">
@@ -65,9 +78,15 @@ export default function CreateAmenity() {
                             <Input
                                 id="icon"
                                 value={data.icon}
-                                onChange={(e) => setData('icon', e.target.value)}
+                                onChange={(e) =>
+                                    setData('icon', e.target.value)
+                                }
                             />
-                            {errors.icon && <p className="text-sm text-destructive">{errors.icon}</p>}
+                            {errors.icon && (
+                                <p className="text-sm text-destructive">
+                                    {errors.icon}
+                                </p>
+                            )}
                         </div>
 
                         <div className="space-y-2">
@@ -76,9 +95,18 @@ export default function CreateAmenity() {
                                 id="display_order"
                                 type="number"
                                 value={data.display_order}
-                                onChange={(e) => setData('display_order', parseInt(e.target.value))}
+                                onChange={(e) =>
+                                    setData(
+                                        'display_order',
+                                        parseInt(e.target.value),
+                                    )
+                                }
                             />
-                            {errors.display_order && <p className="text-sm text-destructive">{errors.display_order}</p>}
+                            {errors.display_order && (
+                                <p className="text-sm text-destructive">
+                                    {errors.display_order}
+                                </p>
+                            )}
                         </div>
 
                         <div className="space-y-2">
@@ -86,9 +114,15 @@ export default function CreateAmenity() {
                             <Textarea
                                 id="description"
                                 value={data.description}
-                                onChange={(e) => setData('description', e.target.value)}
+                                onChange={(e) =>
+                                    setData('description', e.target.value)
+                                }
                             />
-                            {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
+                            {errors.description && (
+                                <p className="text-sm text-destructive">
+                                    {errors.description}
+                                </p>
+                            )}
                         </div>
                     </div>
 

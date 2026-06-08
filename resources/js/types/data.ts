@@ -36,6 +36,55 @@ export interface MediaItem {
     size: number;
 }
 
+export interface ReviewPage {
+    data: ReviewItem[];
+    current_page: number;
+    from: number | null;
+    last_page: number;
+    path: string;
+    per_page: number;
+    to: number | null;
+    total: number;
+    links: {
+        url: string | null;
+        label: string;
+        active: boolean;
+    }[];
+    first_page_url: string;
+    last_page_url: string;
+    next_page_url: string | null;
+    prev_page_url: string | null;
+}
+
+export interface ReviewStats {
+    total: number;
+    avg_overall: number;
+    avg_cleanliness: number;
+    avg_comfort: number;
+    avg_service: number;
+    avg_location: number;
+    avg_value: number;
+    recommend_pct: number;
+}
+
+export interface ReviewItem {
+    id: number;
+    name: string;
+    country: string;
+    roomNumber: string;
+    stayDate: string;
+    overallRating: number;
+    cleanlinessRating?: number;
+    comfortRating?: number;
+    serviceRating?: number;
+    locationRating?: number;
+    valueRating?: number;
+    review: string;
+    suggestions?: string | null;
+    wouldRecommend: boolean;
+    createdAt: string;
+}
+
 export interface LocalEventItem {
     id: string;
     title: string;
