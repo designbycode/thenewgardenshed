@@ -123,4 +123,6 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'review_page_password' => env('REVIEW_PAGE_PASSWORD'),
+
 ];
