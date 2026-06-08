@@ -1,7 +1,7 @@
 import MainWrapper from '@/layouts/main/main-wrapper';
 import MainLayout from '@/layouts/main-layout';
-import ContactInfo from './contact-info';
 import ContactForm from './contact-form';
+import ContactInfo from './contact-info';
 import ContactLocation from './contact-location';
 
 export default function ContactUsIndex() {

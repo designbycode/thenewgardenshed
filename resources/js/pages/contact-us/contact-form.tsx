@@ -1,6 +1,6 @@
-import { useRef } from 'react';
 import { Form } from '@inertiajs/react';
 import { LoaderCircle, Send } from 'lucide-react';
+import { useRef } from 'react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

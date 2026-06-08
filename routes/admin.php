@@ -1,10 +1,18 @@
 <?php
 
+use App\Http\Controllers\Admin\AmenityController;
 use App\Http\Controllers\Admin\RoomController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
     Route::redirect('/', '/admin/rooms');
+
+    Route::get('amenities', [AmenityController::class, 'index'])->name('amenities.index');
+    Route::get('amenities/create', [AmenityController::class, 'create'])->name('amenities.create');
+    Route::post('amenities', [AmenityController::class, 'store'])->name('amenities.store');
+    Route::get('amenities/{amenity}', [AmenityController::class, 'edit'])->name('amenities.edit');
+    Route::put('amenities/{amenity}', [AmenityController::class, 'update'])->name('amenities.update');
+    Route::delete('amenities/{amenity}', [AmenityController::class, 'destroy'])->name('amenities.destroy');
 
     Route::get('rooms', [RoomController::class, 'index'])->name('rooms.index');
     Route::get('rooms/create', [RoomController::class, 'create'])->name('rooms.create');
