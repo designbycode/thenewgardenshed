@@ -1,7 +1,9 @@
-import AppLayout from '@/layouts/app-layout';
 import { Head, Link, router } from '@inertiajs/react';
-import { Search, Eye, Calendar, User } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Eye, Search } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import Heading from '@/components/heading';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
     Table,
@@ -11,8 +13,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { dashboard } from '@/routes';
 import { index, show } from '@/routes/admin/bookings';
 
 interface Booking {
@@ -69,18 +70,18 @@ export default function BookingIndex({ bookings, filters }: PageProps) {
     };
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Bookings', href: index().url }]}>
+        <>
             <Head title="Manage Bookings" />
 
-            <div className="flex flex-col gap-6 p-6">
-                <div>
-                    <h1 className="text-2xl font-semibold">Bookings</h1>
-                    <p className="text-sm text-muted-foreground">
-                        Track and manage room reservations.
-                    </p>
+            <div className="flex flex-col gap-6 p-4">
+                <div className="flex items-center justify-between">
+                    <Heading
+                        title="Bookings"
+                        description="Track and manage room reservations"
+                    />
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-4">
                     <div className="relative w-full max-w-sm">
                         <Search className="absolute top-2.5 left-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
@@ -92,7 +93,7 @@ export default function BookingIndex({ bookings, filters }: PageProps) {
                     </div>
                 </div>
 
-                <div className="rounded-md border">
+                <div className="rounded-xl border">
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -121,11 +122,17 @@ export default function BookingIndex({ bookings, filters }: PageProps) {
                                         <TableCell className="text-sm font-medium">R {booking.total_price}</TableCell>
                                         <TableCell>{getStatusBadge(booking.status)}</TableCell>
                                         <TableCell className="text-right">
-                                            <Link href={show(booking.id).url}>
-                                                <Button variant="outline" size="icon">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                asChild
+                                            >
+                                                <Link
+                                                    href={show(booking.id).url}
+                                                >
                                                     <Eye className="h-4 w-4" />
-                                                </Button>
-                                            </Link>
+                                                </Link>
+                                            </Button>
                                         </TableCell>
                                     </TableRow>
                                 ))
@@ -140,6 +147,13 @@ export default function BookingIndex({ bookings, filters }: PageProps) {
                     </Table>
                 </div>
             </div>
-        </AppLayout>
+        </>
     );
 }
+
+BookingIndex.layout = {
+    breadcrumbs: [
+        { title: 'Dashboard', href: dashboard() },
+        { title: 'Bookings' },
+    ],
+};

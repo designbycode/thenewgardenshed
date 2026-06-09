@@ -1,8 +1,18 @@
-import AppLayout from '@/layouts/app-layout';
 import { Head, router } from '@inertiajs/react';
-import { Check, Trash2, X, MessageSquare, Search } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Check, Search, Trash2, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import Heading from '@/components/heading';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import {
     Table,
@@ -12,8 +22,8 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { index, approve, reject, destroy } from '@/routes/admin/reviews';
+import { dashboard } from '@/routes';
+import { approve, destroy, index, reject } from '@/routes/admin/reviews';
 
 interface Review {
     id: number;
@@ -36,6 +46,7 @@ interface PageProps {
 
 export default function ReviewIndex({ reviews, filters }: PageProps) {
     const [search, setSearch] = useState(filters.search || '');
+    const [deletingId, setDeletingId] = useState<number | null>(null);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -60,26 +71,25 @@ export default function ReviewIndex({ reviews, filters }: PageProps) {
     };
 
     const handleDelete = (id: number) => {
-        if (confirm('Are you sure you want to delete this review?')) {
-            router.delete(destroy(id).url, { preserveScroll: true });
-        }
+        router.delete(destroy(id).url, {
+            preserveScroll: true,
+            onSuccess: () => setDeletingId(null),
+        });
     };
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Reviews', href: index().url }]}>
+        <>
             <Head title="Manage Reviews" />
 
-            <div className="flex flex-col gap-6 p-6">
+            <div className="flex flex-col gap-6 p-4">
                 <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-semibold">Reviews</h1>
-                        <p className="text-sm text-muted-foreground">
-                            Moderate and manage guest reviews.
-                        </p>
-                    </div>
+                    <Heading
+                        title="Reviews"
+                        description="Moderate and manage guest reviews"
+                    />
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-4">
                     <div className="relative w-full max-w-sm">
                         <Search className="absolute top-2.5 left-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
@@ -91,7 +101,7 @@ export default function ReviewIndex({ reviews, filters }: PageProps) {
                     </div>
                 </div>
 
-                <div className="rounded-md border">
+                <div className="rounded-xl border">
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -151,9 +161,11 @@ export default function ReviewIndex({ reviews, filters }: PageProps) {
                                                     </Button>
                                                 )}
                                                 <Button
-                                                    variant="outline"
+                                                    variant="ghost"
                                                     size="icon"
-                                                    onClick={() => handleDelete(review.id)}
+                                                    onClick={() =>
+                                                        setDeletingId(review.id)
+                                                    }
                                                     title="Delete"
                                                 >
                                                     <Trash2 className="h-4 w-4 text-destructive" />
@@ -173,6 +185,43 @@ export default function ReviewIndex({ reviews, filters }: PageProps) {
                     </Table>
                 </div>
             </div>
-        </AppLayout>
+
+            <Dialog
+                open={deletingId !== null}
+                onOpenChange={(open) => {
+                    if (!open) setDeletingId(null);
+                }}
+            >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Delete Review</DialogTitle>
+                        <DialogDescription>
+                            Are you sure you want to delete this review? This
+                            action cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button variant="secondary">Cancel</Button>
+                        </DialogClose>
+                        <Button
+                            variant="destructive"
+                            onClick={() =>
+                                deletingId && handleDelete(deletingId)
+                            }
+                        >
+                            Delete Review
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </>
     );
 }
+
+ReviewIndex.layout = {
+    breadcrumbs: [
+        { title: 'Dashboard', href: dashboard() },
+        { title: 'Reviews' },
+    ],
+};

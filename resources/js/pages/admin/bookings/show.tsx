@@ -1,6 +1,14 @@
-import AppLayout from '@/layouts/app-layout';
 import { Head, router } from '@inertiajs/react';
-import { ArrowLeft, Calendar, User, Phone, Mail, Home, CreditCard, Clock } from 'lucide-react';
+import {
+    ArrowLeft,
+    Calendar,
+    Clock,
+    Home,
+    Mail,
+    Phone,
+    User,
+} from 'lucide-react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -16,7 +24,17 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { index, update, destroy } from '@/routes/admin/bookings';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { dashboard } from '@/routes';
+import { destroy, index, update } from '@/routes/admin/bookings';
 
 interface Booking {
     id: number;
@@ -40,31 +58,37 @@ interface PageProps {
 }
 
 export default function BookingShow({ booking }: PageProps) {
+    const [isDeleting, setIsDeleting] = useState(false);
+
     const handleStatusChange = (status: string) => {
         router.put(update(booking.id).url, { status });
     };
 
     const handleDelete = () => {
-        if (confirm('Are you sure you want to delete this booking?')) {
-            router.delete(destroy(booking.id).url);
-        }
+        router.delete(destroy(booking.id).url, {
+            onSuccess: () => setIsDeleting(false),
+        });
     };
 
     return (
-        <AppLayout breadcrumbs={[
-            { title: 'Bookings', href: index().url },
-            { title: `Booking #${booking.id}`, href: '' }
-        ]}>
+        <>
             <Head title={`Booking #${booking.id}`} />
 
-            <div className="flex flex-col gap-6 p-6">
+            <div className="flex flex-col gap-6 p-4">
                 <div className="flex items-center justify-between">
-                    <Button variant="ghost" onClick={() => router.get(index().url)} className="gap-2">
+                    <Button
+                        variant="ghost"
+                        onClick={() => router.get(index().url)}
+                        className="gap-2"
+                    >
                         <ArrowLeft className="h-4 w-4" />
                         Back to Bookings
                     </Button>
                     <div className="flex gap-2">
-                        <Button variant="destructive" onClick={handleDelete}>
+                        <Button
+                            variant="destructive"
+                            onClick={() => setIsDeleting(true)}
+                        >
                             Delete Booking
                         </Button>
                     </div>
@@ -179,6 +203,34 @@ export default function BookingShow({ booking }: PageProps) {
                     </div>
                 </div>
             </div>
-        </AppLayout>
+
+            <Dialog open={isDeleting} onOpenChange={setIsDeleting}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Delete Booking</DialogTitle>
+                        <DialogDescription>
+                            Are you sure you want to delete this booking? This
+                            action cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button variant="secondary">Cancel</Button>
+                        </DialogClose>
+                        <Button variant="destructive" onClick={handleDelete}>
+                            Delete Booking
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </>
     );
 }
+
+BookingShow.layout = {
+    breadcrumbs: [
+        { title: 'Dashboard', href: dashboard() },
+        { title: 'Bookings', href: index().url },
+        { title: 'Booking Detail' },
+    ],
+};

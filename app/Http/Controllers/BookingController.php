@@ -29,6 +29,8 @@ class BookingController extends Controller
 
         event(new BookingCreated($booking));
 
+        session()->flash('toast', ['type' => 'success', 'message' => 'Your booking request has been submitted successfully.']);
+
         return redirect()->back()->with('booking_success', 'Your booking request has been submitted successfully.');
     }
 }
