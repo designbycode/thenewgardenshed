@@ -103,7 +103,7 @@ export default function AdminRoomsIndex({
         }),
         columnHelper.accessor('price_per_night', {
             header: 'Price / Night',
-            cell: ({ getValue }) => `$${Number(getValue()).toFixed(2)}`,
+            cell: ({ getValue }) => `R${Number(getValue()).toFixed(2)}`,
         }),
         columnHelper.accessor('capacity', {
             header: 'Capacity',
