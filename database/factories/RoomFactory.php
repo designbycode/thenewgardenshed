@@ -27,7 +27,7 @@ class RoomFactory extends Factory
             'short_description' => $this->faker->sentence(),
             'price_per_night' => $this->faker->randomFloat(2, 50, 500),
             'capacity' => $this->faker->numberBetween(1, 4),
-            'max_guests' => $this->faker->numberBetween(1, 4),
+            'max_guests' => $this->faker->numberBetween(2, 4),
             'bed_type' => $this->faker->randomElement(['King', 'Queen', 'Double']),
             'bathroom_type' => $this->faker->randomElement(['Ensuite', 'Shared']),
         ];
