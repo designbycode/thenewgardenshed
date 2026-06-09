@@ -22,7 +22,7 @@ class ContactNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New Contact Inquiry: ' . $this->data['subject'],
+            subject: 'New Contact Inquiry: '.$this->data['subject'],
         );
     }
 

@@ -10,7 +10,7 @@ class CheckBookingEnabled
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (!config('app.booking_system_enabled')) {
+        if (! config('app.booking_system_enabled')) {
             abort(403, 'Booking system is currently disabled.');
         }
 

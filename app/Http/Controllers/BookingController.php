@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\BookingCreated;
 use App\Http\Requests\BookingStoreRequest;
 use App\Models\Booking;
 use App\Models\Room;
-use App\Events\BookingCreated;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 

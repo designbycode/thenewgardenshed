@@ -21,7 +21,7 @@ class ReviewFactory extends Factory
             'name' => $this->faker->name(),
             'email' => $this->faker->safeEmail(),
             'country' => $this->faker->country(),
-            'room_number' => 'Suite ' . $this->faker->numberBetween(1, 10),
+            'room_number' => 'Suite '.$this->faker->numberBetween(1, 10),
             'stay_date' => $this->faker->date(),
             'overall_rating' => $this->faker->numberBetween(1, 5),
             'cleanliness_rating' => $this->faker->numberBetween(1, 5),

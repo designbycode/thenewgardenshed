@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckBookingEnabled;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
@@ -24,7 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'booking.enabled' => \App\Http\Middleware\CheckBookingEnabled::class,
+            'booking.enabled' => CheckBookingEnabled::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

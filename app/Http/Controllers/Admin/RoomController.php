@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Amenity;
 use App\Http\Requests\Admin\ReorderImagesRequest;
 use App\Http\Requests\Admin\StoreRoomRequest;
 use App\Http\Requests\Admin\UpdateRoomRequest;
 use App\Http\Requests\Admin\UploadImageRequest;
+use App\Models\Amenity;
 use App\Models\Room;
 use Illuminate\Http\Request;
 use Inertia\Inertia;

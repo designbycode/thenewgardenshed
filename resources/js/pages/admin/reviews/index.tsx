@@ -1,6 +1,6 @@
 import { Head, router } from '@inertiajs/react';
-import { Check, Search, Trash2, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Check, Eye, Search, Trash2, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import Heading from '@/components/heading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,7 +23,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { dashboard } from '@/routes';
-import { approve, destroy, index, reject } from '@/routes/admin/reviews';
+import { approve, destroy, index, reject, show } from '@/routes/admin/reviews';
 
 interface Review {
     id: number;
@@ -41,26 +41,35 @@ interface PageProps {
     };
     filters: {
         search?: string;
+        status?: string;
     };
 }
 
 export default function ReviewIndex({ reviews, filters }: PageProps) {
     const [search, setSearch] = useState(filters.search || '');
+    const [statusFilter, setStatusFilter] = useState(filters.status || '');
     const [deletingId, setDeletingId] = useState<number | null>(null);
+    const isFirstRender = useRef(true);
 
     useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+
         const timer = setTimeout(() => {
-            if (search !== filters.search) {
-                router.get(
-                    index().url,
-                    { search },
-                    { preserveState: true, preserveScroll: true, replace: true }
-                );
-            }
+            router.get(
+                index().url,
+                {
+                    ...(search ? { search } : {}),
+                    ...(statusFilter ? { status: statusFilter } : {}),
+                },
+                { preserveState: true, preserveScroll: true, replace: true }
+            );
         }, 300);
 
         return () => clearTimeout(timer);
-    }, [search]);
+    }, [search, statusFilter]);
 
     const handleApprove = (id: number) => {
         router.post(approve(id).url, {}, { preserveScroll: true });
@@ -89,7 +98,7 @@ export default function ReviewIndex({ reviews, filters }: PageProps) {
                     />
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 flex-wrap">
                     <div className="relative w-full max-w-sm">
                         <Search className="absolute top-2.5 left-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
@@ -99,6 +108,16 @@ export default function ReviewIndex({ reviews, filters }: PageProps) {
                             onChange={(e) => setSearch(e.target.value)}
                         />
                     </div>
+
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="flex h-9 w-40 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs"
+                    >
+                        <option value="">All Statuses</option>
+                        <option value="approved">Approved</option>
+                        <option value="pending">Pending</option>
+                    </select>
                 </div>
 
                 <div className="rounded-xl border">
@@ -141,6 +160,14 @@ export default function ReviewIndex({ reviews, filters }: PageProps) {
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex justify-end gap-2">
+                                                <Button
+                                                    variant="outline"
+                                                    size="icon"
+                                                    onClick={() => router.get(show(review.id).url)}
+                                                    title="View Details"
+                                                >
+                                                    <Eye className="h-4 w-4 text-primary" />
+                                                </Button>
                                                 {!review.is_approved ? (
                                                     <Button
                                                         variant="outline"

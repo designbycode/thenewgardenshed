@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
-use App\Events\BookingCreated;
-use App\Listeners\SendAdminBookingNotification;
-use App\Listeners\SendClientBookingNotification;
 
 class AppServiceProvider extends ServiceProvider
 {

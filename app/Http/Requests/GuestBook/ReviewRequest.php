@@ -45,7 +45,7 @@ class ReviewRequest extends FormRequest
                 if ($this->input('password') !== $expected) {
                     $validator->errors()->add('password', 'The review page password is incorrect.');
                 }
-            } elseif (!$this->session()->get('review_authenticated')) {
+            } elseif (! $this->session()->get('review_authenticated')) {
                 $validator->errors()->add('password', 'Session expired. Please re-verify.');
             }
         });

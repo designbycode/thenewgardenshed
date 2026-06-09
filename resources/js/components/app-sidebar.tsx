@@ -23,16 +23,6 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Rooms',
-        href: '/admin/rooms',
-        icon: DoorOpen,
-    },
-    {
-        title: 'Amenities',
-        href: '/admin/amenities',
-        icon: BookOpen,
-    },
-    {
         title: 'Bookings',
         href: '/admin/bookings',
         icon: Calendar,
@@ -41,6 +31,17 @@ const mainNavItems: NavItem[] = [
         title: 'Reviews',
         href: '/admin/reviews',
         icon: MessageSquare,
+        separator: true,
+    },
+    {
+        title: 'Rooms',
+        href: '/admin/rooms',
+        icon: DoorOpen,
+    },
+    {
+        title: 'Amenities',
+        href: '/admin/amenities',
+        icon: BookOpen,
     },
 ];
 

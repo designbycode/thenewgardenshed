@@ -26,10 +26,10 @@ class GuestBookIndexController extends Controller
             ->first();
 
         return Inertia::render('guest-book/index', [
-            'reviews' => Inertia::scroll(fn() => Review::approved()
+            'reviews' => Inertia::scroll(fn () => Review::approved()
                 ->recent()
                 ->paginate(9)
-                ->through(fn($review) => [
+                ->through(fn ($review) => [
                     'id' => $review->id,
                     'name' => $review->name,
                     'country' => $review->country,

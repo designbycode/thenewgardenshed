@@ -7,7 +7,7 @@ use App\Models\Room;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class BookingStoreRequest extends FormRequest
+class AdminBookingStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,10 +29,12 @@ class BookingStoreRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'max:20'],
-            'check_in' => ['required', 'date', 'after_or_equal:today'],
+            'check_in' => ['required', 'date'], // Relaxed for admin to allow same-day or custom dates
             'check_out' => ['required', 'date', 'after:check_in'],
             'guests' => ['required', 'integer', 'min:1'],
             'notes' => ['nullable', 'string', 'max:1000'],
+            'discount_type' => ['nullable', 'string', 'in:fixed,percentage'],
+            'discount_value' => ['nullable', 'numeric', 'min:0'],
         ];
     }
 
@@ -62,7 +64,7 @@ class BookingStoreRequest extends FormRequest
                     ->exists();
 
                 if ($overlap) {
-                    $validator->errors()->add('check_in', 'The selected room is not available for these dates.');
+                    $validator->errors()->add('check_in', 'The selected room is already booked for these dates.');
                 }
             }
 
@@ -74,6 +76,13 @@ class BookingStoreRequest extends FormRequest
                 if ($room && $guests > $room->max_guests) {
                     $validator->errors()->add('guests', "The number of guests cannot exceed {$room->max_guests}.");
                 }
+            }
+
+            $discountType = $this->input('discount_type');
+            $discountValue = (float) $this->input('discount_value');
+
+            if ($discountType === 'percentage' && $discountValue > 100) {
+                $validator->errors()->add('discount_value', 'Percentage discount cannot exceed 100%.');
             }
         });
     }

@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Eye, Search } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Eye, Search, Calendar, Plus } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import Heading from '@/components/heading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { dashboard } from '@/routes';
-import { index, show } from '@/routes/admin/bookings';
+import { index, show, calendar, create } from '@/routes/admin/bookings';
 
 interface Booking {
     id: number;
@@ -29,32 +29,50 @@ interface Booking {
     };
 }
 
+interface RoomItem {
+    id: number;
+    name: string;
+}
+
 interface PageProps {
     bookings: {
         data: Booking[];
         links: any[];
     };
+    rooms: RoomItem[];
     filters: {
         search?: string;
+        status?: string;
+        room_id?: string;
     };
 }
 
-export default function BookingIndex({ bookings, filters }: PageProps) {
+export default function BookingIndex({ bookings, rooms, filters }: PageProps) {
     const [search, setSearch] = useState(filters.search || '');
+    const [statusFilter, setStatusFilter] = useState(filters.status || '');
+    const [roomFilter, setRoomFilter] = useState(filters.room_id || '');
+    const isFirstRender = useRef(true);
 
     useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+
         const timer = setTimeout(() => {
-            if (search !== filters.search) {
-                router.get(
-                    index().url,
-                    { search },
-                    { preserveState: true, preserveScroll: true, replace: true }
-                );
-            }
+            router.get(
+                index().url,
+                {
+                    ...(search ? { search } : {}),
+                    ...(statusFilter ? { status: statusFilter } : {}),
+                    ...(roomFilter ? { room_id: roomFilter } : {}),
+                },
+                { preserveState: true, preserveScroll: true, replace: true }
+            );
         }, 300);
 
         return () => clearTimeout(timer);
-    }, [search]);
+    }, [search, statusFilter, roomFilter]);
 
     const getStatusBadge = (status: string) => {
         switch (status) {
@@ -79,9 +97,23 @@ export default function BookingIndex({ bookings, filters }: PageProps) {
                         title="Bookings"
                         description="Track and manage room reservations"
                     />
+                    <div className="flex items-center gap-2">
+                        <Button variant="outline" asChild className="gap-2">
+                            <Link href={calendar().url}>
+                                <Calendar className="h-4 w-4" />
+                                Calendar View
+                            </Link>
+                        </Button>
+                        <Button asChild className="gap-2">
+                            <Link href={create().url}>
+                                <Plus className="h-4 w-4" />
+                                Create Booking
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 flex-wrap">
                     <div className="relative w-full max-w-sm">
                         <Search className="absolute top-2.5 left-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
@@ -91,6 +123,29 @@ export default function BookingIndex({ bookings, filters }: PageProps) {
                             onChange={(e) => setSearch(e.target.value)}
                         />
                     </div>
+                    
+                    <select
+                        value={roomFilter}
+                        onChange={(e) => setRoomFilter(e.target.value)}
+                        className="flex h-9 w-48 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs"
+                    >
+                        <option value="">All Rooms</option>
+                        {rooms.map(room => (
+                            <option key={room.id} value={room.id.toString()}>{room.name}</option>
+                        ))}
+                    </select>
+
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="flex h-9 w-40 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs"
+                    >
+                        <option value="">All Statuses</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="cancelled">Cancelled</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
                 </div>
 
                 <div className="rounded-xl border">
