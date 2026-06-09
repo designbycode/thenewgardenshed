@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
-use App\Events\BookingCreated;
-use App\Listeners\SendAdminBookingNotification;
-use App\Listeners\SendClientBookingNotification;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,15 +26,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
 
-        Event::listen(
-            BookingCreated::class,
-            [SendAdminBookingNotification::class, 'handle']
-        );
-
-        Event::listen(
-            BookingCreated::class,
-            [SendClientBookingNotification::class, 'handle']
-        );
+        // Event listeners are automatically discovered by Laravel 19/11 from the Listeners folder.
     }
 
     /**

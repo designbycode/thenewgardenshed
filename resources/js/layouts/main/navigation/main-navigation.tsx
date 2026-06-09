@@ -2,11 +2,11 @@ import { Menu } from 'lucide-react';
 // import logo from '@/../images/logo-banner.svg';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import MainNavigationBrand from '@/layouts/main/brand/main-navigation-brand';
 import MainWrapper from '@/layouts/main/main-wrapper';
 import MainNavigationLinks from '@/layouts/main/navigation/main-navigation-links';
 import MainThemeToggle from '@/layouts/main/navigation/main-theme-toggle';
 import MainTopNavigation from '@/layouts/main/navigation/main-top-navigation';
-import MainNavigationBrand from '@/layouts/main/brand/main-navigation-brand';
 
 export default function MainNavigation() {
     return (
@@ -41,7 +41,7 @@ export default function MainNavigation() {
                                 <Menu className="h-6 w-6" />
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="right" className="w-[300px]">
+                        <SheetContent side="right" className="w-75">
                             <MainNavigationLinks variant="mobile" />
                         </SheetContent>
                     </Sheet>

@@ -22,7 +22,7 @@ class ContactConfirmation extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'We received your message, ' . $this->data['name'],
+            subject: 'We received your message, '.$this->data['name'],
         );
     }
 

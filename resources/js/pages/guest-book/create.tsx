@@ -1,4 +1,5 @@
 import { Form, usePage } from '@inertiajs/react';
+import type { PageProps } from '@inertiajs/core';
 import {
     CheckCircle,
     LoaderCircle,
@@ -27,11 +28,11 @@ import MainWrapper from '@/layouts/main/main-wrapper';
 import MainLayout from '@/layouts/main-layout';
 import { create, store } from '@/routes/guest-book';
 
-interface CreatePageProps {
+interface CreatePageProps extends PageProps {
     review_authenticated: boolean;
     flash: {
         review_created?: boolean;
-    };
+    } & PageProps['flash'];
 }
 
 const RATING_CATEGORIES = [
@@ -84,6 +85,14 @@ export default function GuestBookCreate() {
     const { review_authenticated, flash } = usePage<CreatePageProps>().props;
     const [passwordDialogOpen, setPasswordDialogOpen] = useState(!review_authenticated);
     const [successDialogOpen, setSuccessDialogOpen] = useState(!!flash?.review_created);
+    const [ratings, setRatings] = useState<Record<string, number>>({
+        overall_rating: 0,
+        cleanliness_rating: 0,
+        comfort_rating: 0,
+        service_rating: 0,
+        location_rating: 0,
+        value_rating: 0,
+    });
 
     return (
         <MainWrapper className="py-18">
@@ -113,13 +122,13 @@ export default function GuestBookCreate() {
                     </DialogHeader>
                     <Form
                         {...store.form()}
-                        data={{ action: 'verify' }}
                         resetOnSuccess={['password']}
                         onSuccess={() => setPasswordDialogOpen(false)}
                         className="space-y-4"
                     >
                         {({ processing, errors }) => (
                             <>
+                                <input type="hidden" name="action" value="verify" />
                                 <div className="space-y-1.5">
                                     <Label htmlFor="password" className="text-xs font-semibold text-muted-foreground">
                                         Password
@@ -157,7 +166,11 @@ export default function GuestBookCreate() {
                             Your Review
                         </h3>
 
-                        <Form {...store.form()} className="space-y-6" resetOnSuccess>
+                        <Form
+                            {...store.form()}
+                            className="space-y-6"
+                            resetOnSuccess
+                        >
                             {({ processing, errors }) => (
                                 <>
                                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -165,14 +178,24 @@ export default function GuestBookCreate() {
                                             <Label htmlFor="name" className="text-xs font-semibold text-muted-foreground">
                                                 Your Name
                                             </Label>
-                                            <Input type="text" id="name" name="name" placeholder="e.g. Jane Doe" />
+                                            <Input
+                                                type="text"
+                                                id="name"
+                                                name="name"
+                                                placeholder="e.g. Jane Doe"
+                                            />
                                             <InputError message={errors.name} />
                                         </div>
                                         <div className="space-y-1.5">
                                             <Label htmlFor="email" className="text-xs font-semibold text-muted-foreground">
                                                 Email Address
                                             </Label>
-                                            <Input type="email" id="email" name="email" placeholder="e.g. jane@example.com" />
+                                            <Input
+                                                type="email"
+                                                id="email"
+                                                name="email"
+                                                placeholder="e.g. jane@example.com"
+                                            />
                                             <InputError message={errors.email} />
                                         </div>
                                     </div>
@@ -182,14 +205,24 @@ export default function GuestBookCreate() {
                                             <Label htmlFor="country" className="text-xs font-semibold text-muted-foreground">
                                                 Country
                                             </Label>
-                                            <Input type="text" id="country" name="country" placeholder="e.g. South Africa" />
+                                            <Input
+                                                type="text"
+                                                id="country"
+                                                name="country"
+                                                placeholder="e.g. South Africa"
+                                            />
                                             <InputError message={errors.country} />
                                         </div>
                                         <div className="space-y-1.5">
                                             <Label htmlFor="room_number" className="text-xs font-semibold text-muted-foreground">
                                                 Room / Suite
                                             </Label>
-                                            <Input type="text" id="room_number" name="room_number" placeholder="e.g. Suite 3" />
+                                            <Input
+                                                type="text"
+                                                id="room_number"
+                                                name="room_number"
+                                                placeholder="e.g. Suite 3"
+                                            />
                                             <InputError message={errors.room_number} />
                                         </div>
                                     </div>
@@ -198,7 +231,12 @@ export default function GuestBookCreate() {
                                         <Label htmlFor="stay_date" className="text-xs font-semibold text-muted-foreground">
                                             Stay Date
                                         </Label>
-                                        <Input type="text" id="stay_date" name="stay_date" placeholder="e.g. June 2026" />
+                                        <Input
+                                            type="text"
+                                            id="stay_date"
+                                            name="stay_date"
+                                            placeholder="e.g. June 2026"
+                                        />
                                         <InputError message={errors.stay_date} />
                                     </div>
 
@@ -207,7 +245,34 @@ export default function GuestBookCreate() {
                                             Ratings
                                         </p>
                                         {RATING_CATEGORIES.map(({ key, label }) => (
-                                            <StarSelect key={key} name={key} label={label} />
+                                            <div key={key} className="flex items-center justify-between gap-2">
+                                                <span className="text-sm text-muted-foreground">{label}</span>
+                                                <div className="flex flex-row-reverse gap-0.5">
+                                                    {[5, 4, 3, 2, 1].map((val) => (
+                                                        <label
+                                                            key={val}
+                                                            className="cursor-pointer p-0.5 transition-transform hover:scale-110"
+                                                        >
+                                                            <input
+                                                                type="radio"
+                                                                name={key}
+                                                                value={val}
+                                                                checked={ratings[key] === val}
+                                                                className="sr-only"
+                                                                onChange={() => setRatings(prev => ({ ...prev, [key]: val }))}
+                                                            />
+                                                            <Star
+                                                                size={20}
+                                                                className={
+                                                                    val <= ratings[key]
+                                                                        ? 'fill-yellow-500 text-yellow-500'
+                                                                        : 'fill-muted text-muted-foreground/30'
+                                                                }
+                                                            />
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         ))}
                                         <InputError message={errors.overall_rating} />
                                     </div>
@@ -244,8 +309,7 @@ export default function GuestBookCreate() {
                                         <input
                                             type="checkbox"
                                             name="would_recommend"
-                                            checked={store.form().data.would_recommend}
-                                            onChange={(e) => store.form().setData('would_recommend', e.target.checked)}
+                                            value="1"
                                             className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
                                         />
                                         <div>

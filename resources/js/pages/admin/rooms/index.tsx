@@ -57,6 +57,7 @@ export default function AdminRoomsIndex({
 }) {
     const [search, setSearch] = useState(filters.search ?? '');
     const [typeFilter, setTypeFilter] = useState(filters.type ?? '');
+    const [capacityFilter, setCapacityFilter] = useState(filters.capacity ?? '');
     const [deletingSlug, setDeletingSlug] = useState<string | null>(null);
     const isFirstRender = useRef(true);
 
@@ -201,6 +202,7 @@ export default function AdminRoomsIndex({
                 {
                     ...(search ? { search } : {}),
                     ...(typeFilter ? { type: typeFilter } : {}),
+                    ...(capacityFilter ? { capacity: capacityFilter } : {}),
                 },
                 {
                     preserveState: true,
@@ -211,7 +213,7 @@ export default function AdminRoomsIndex({
         }, 300);
 
         return () => clearTimeout(timer);
-    }, [search, typeFilter]);
+    }, [search, typeFilter, capacityFilter]);
 
     return (
         <>
@@ -231,8 +233,8 @@ export default function AdminRoomsIndex({
                     </Button>
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <div className="relative flex-1">
+                <div className="flex items-center gap-4 flex-wrap">
+                    <div className="relative flex-1 min-w-[200px]">
                         <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
                             placeholder="Search rooms..."
@@ -250,6 +252,19 @@ export default function AdminRoomsIndex({
                         <option value="luxury">Luxury</option>
                         <option value="standard">Standard</option>
                         <option value="cozy">Cozy</option>
+                    </select>
+
+                    <select
+                        value={capacityFilter}
+                        onChange={(e) => setCapacityFilter(e.target.value)}
+                        className="flex h-9 w-40 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs"
+                    >
+                        <option value="">All Capacities</option>
+                        <option value="1">1+ Guest</option>
+                        <option value="2">2+ Guests</option>
+                        <option value="3">3+ Guests</option>
+                        <option value="4">4+ Guests</option>
+                        <option value="6">6+ Guests</option>
                     </select>
                 </div>
 

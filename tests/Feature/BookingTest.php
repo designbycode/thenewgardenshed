@@ -2,15 +2,21 @@
 
 namespace Tests\Feature;
 
+use App\Models\Booking;
 use App\Models\Room;
 use App\Models\User;
-use App\Models\Booking;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class BookingTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->app->make('config')->set('app.booking_system_enabled', true);
+    }
 
     public function test_user_can_request_a_booking(): void
     {
@@ -64,6 +70,129 @@ class BookingTest extends TestCase
         $this->assertDatabaseCount('bookings', 1);
     }
 
+    public function test_booking_is_rejected_when_system_disabled(): void
+    {
+        config(['app.booking_system_enabled' => false]);
+
+        $room = Room::factory()->create(['price_per_night' => 1000]);
+
+        $response = $this->post(route('bookings.store'), [
+            'room_id' => $room->id,
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'check_in' => now()->addDay()->format('Y-m-d'),
+            'check_out' => now()->addDays(3)->format('Y-m-d'),
+            'guests' => 2,
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_booking_succeeds_when_system_enabled(): void
+    {
+        $room = Room::factory()->create(['price_per_night' => 1000]);
+
+        $response = $this->post(route('bookings.store'), [
+            'room_id' => $room->id,
+            'name' => 'Jane Doe',
+            'email' => 'jane@example.com',
+            'check_in' => now()->addDay()->format('Y-m-d'),
+            'check_out' => now()->addDays(3)->format('Y-m-d'),
+            'guests' => 2,
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertDatabaseHas('bookings', ['email' => 'jane@example.com']);
+    }
+
+    public function test_booking_rejected_when_guests_exceed_capacity(): void
+    {
+        $room = Room::factory()->create(['price_per_night' => 1000, 'max_guests' => 2]);
+
+        $response = $this->post(route('bookings.store'), [
+            'room_id' => $room->id,
+            'name' => 'Group Booking',
+            'email' => 'group@example.com',
+            'check_in' => now()->addDay()->format('Y-m-d'),
+            'check_out' => now()->addDays(3)->format('Y-m-d'),
+            'guests' => 5,
+        ]);
+
+        $response->assertSessionHasErrors(['guests']);
+    }
+
+    public function test_booking_succeeds_when_guests_within_capacity(): void
+    {
+        $room = Room::factory()->create(['price_per_night' => 1000, 'max_guests' => 4]);
+
+        $response = $this->post(route('bookings.store'), [
+            'room_id' => $room->id,
+            'name' => 'Small Group',
+            'email' => 'small@example.com',
+            'check_in' => now()->addDay()->format('Y-m-d'),
+            'check_out' => now()->addDays(3)->format('Y-m-d'),
+            'guests' => 4,
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertDatabaseHas('bookings', ['email' => 'small@example.com']);
+    }
+
+    public function test_booking_creation_sends_notification_emails(): void
+    {
+        $room = Room::factory()->create(['price_per_night' => 1000]);
+
+        $response = $this->post(route('bookings.store'), [
+            'room_id' => $room->id,
+            'name' => 'Mail Test',
+            'email' => 'mailtest@example.com',
+            'check_in' => now()->addDay()->format('Y-m-d'),
+            'check_out' => now()->addDays(3)->format('Y-m-d'),
+            'guests' => 2,
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertDatabaseHas('bookings', ['email' => 'mailtest@example.com']);
+    }
+
+    public function test_booking_rejects_notes_exceeding_max_length(): void
+    {
+        $room = Room::factory()->create(['price_per_night' => 1000]);
+
+        $response = $this->post(route('bookings.store'), [
+            'room_id' => $room->id,
+            'name' => 'Notes Test',
+            'email' => 'notes@example.com',
+            'check_in' => now()->addDay()->format('Y-m-d'),
+            'check_out' => now()->addDays(3)->format('Y-m-d'),
+            'guests' => 2,
+            'notes' => str_repeat('a', 1001),
+        ]);
+
+        $response->assertSessionHasErrors(['notes']);
+    }
+
+    public function test_booking_succeeds_with_valid_notes(): void
+    {
+        $room = Room::factory()->create(['price_per_night' => 1000]);
+
+        $response = $this->post(route('bookings.store'), [
+            'room_id' => $room->id,
+            'name' => 'Notes Test',
+            'email' => 'notes@example.com',
+            'check_in' => now()->addDay()->format('Y-m-d'),
+            'check_out' => now()->addDays(3)->format('Y-m-d'),
+            'guests' => 2,
+            'notes' => 'Please provide a hypoallergenic pillow.',
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertDatabaseHas('bookings', [
+            'email' => 'notes@example.com',
+            'notes' => 'Please provide a hypoallergenic pillow.',
+        ]);
+    }
+
     public function test_admin_can_update_booking_status(): void
     {
         $user = User::factory()->create();
@@ -84,5 +213,49 @@ class BookingTest extends TestCase
 
         $response->assertStatus(302);
         $this->assertEquals('confirmed', $booking->fresh()->status);
+    }
+
+    public function test_booking_create_page_loads(): void
+    {
+        Room::factory()->count(3)->create(['is_active' => true]);
+
+        $response = $this->get(route('booking.create'));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->component('booking/create')
+            ->has('rooms', 3)
+        );
+    }
+
+    public function test_booking_create_page_pre_selects_room(): void
+    {
+        $room = Room::factory()->create(['is_active' => true]);
+
+        $response = $this->get(route('booking.create', ['room_id' => $room->id]));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->component('booking/create')
+            ->where('preselectedRoomId', $room->id)
+        );
+    }
+
+    public function test_booking_stores_redirects_to_booking_create(): void
+    {
+        $room = Room::factory()->create(['price_per_night' => 1000, 'max_guests' => 4]);
+
+        $response = $this->post(route('bookings.store'), [
+            'room_id' => $room->id,
+            'name' => 'Redirect Test',
+            'email' => 'redirect@example.com',
+            'check_in' => now()->addDay()->format('Y-m-d'),
+            'check_out' => now()->addDays(3)->format('Y-m-d'),
+            'guests' => 2,
+        ]);
+
+        $response->assertRedirect(route('booking.create'));
+        $response->assertSessionHas('booking_success');
+        $response->assertSessionHas('booked_details');
     }
 }

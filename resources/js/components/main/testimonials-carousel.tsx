@@ -3,10 +3,11 @@ import { Star } from 'lucide-react';
 import { Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
-import type { ReviewItem } from '@/types/data';
 import { Button } from '@/components/ui/button';
-import { index as guestBookIndex } from '@/routes/guest-book';
 import MainWrapper from '@/layouts/main/main-wrapper';
+import { index as guestBookIndex } from '@/routes/guest-book';
+import type { ReviewItem } from '@/types/data';
+import { Card } from '@/components/ui/card';
 
 function StarRating({ rating }: { rating: number }) {
     return (
@@ -78,7 +79,7 @@ export default function TestimonialsCarousel({
                 >
                     {shuffled.map((review) => (
                         <SwiperSlide key={review.id}>
-                            <div className="flex w-full flex-col rounded-2xl border border-border bg-card p-6 shadow-md">
+                            <Card className="flex w-full flex-col p-6">
                                 <div className="mb-3 flex items-start justify-between gap-4">
                                     <div>
                                         <p className="text-sm font-semibold text-foreground">
@@ -98,11 +99,10 @@ export default function TestimonialsCarousel({
                                         </p>
                                     </div>
                                 </div>
-
                                 <p className="line-clamp-4 flex-1 text-sm leading-relaxed text-muted-foreground">
                                     &ldquo;{review.review}&rdquo;
                                 </p>
-                            </div>
+                            </Card>
                         </SwiperSlide>
                     ))}
                 </Swiper>

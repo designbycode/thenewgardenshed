@@ -7,6 +7,7 @@ export interface RoomItem {
     shortDescription: string;
     pricePerNight: number;
     capacity: number;
+    maxGuests: number;
     bedType: string;
     bathroomType: string;
     thumbnail?: string | null;
@@ -15,6 +16,7 @@ export interface RoomItem {
     images_count?: number;
     amenities?: string[];
     media?: MediaItem[];
+    bookings?: { check_in: string; check_out: string }[];
 }
 
 export interface AmenityItem {

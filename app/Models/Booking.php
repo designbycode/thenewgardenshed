@@ -18,8 +18,13 @@ class Booking extends Model
         'check_in',
         'check_out',
         'guests',
+        'notes',
         'total_price',
         'status',
+        'original_price',
+        'discount_amount',
+        'discount_type',
+        'discount_value',
     ];
 
     protected function casts(): array
@@ -29,6 +34,9 @@ class Booking extends Model
             'check_out' => 'date',
             'guests' => 'integer',
             'total_price' => 'decimal:2',
+            'original_price' => 'decimal:2',
+            'discount_amount' => 'decimal:2',
+            'discount_value' => 'decimal:2',
         ];
     }
 

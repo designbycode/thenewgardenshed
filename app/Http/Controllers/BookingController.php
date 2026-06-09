@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\BookingCreated;
 use App\Http\Requests\BookingStoreRequest;
 use App\Models\Booking;
 use App\Models\Room;
-use App\Events\BookingCreated;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 
@@ -29,6 +29,21 @@ class BookingController extends Controller
 
         event(new BookingCreated($booking));
 
-        return redirect()->back()->with('booking_success', 'Your booking request has been submitted successfully.');
+        session()->flash('toast', ['type' => 'success', 'message' => 'Your booking request has been submitted successfully.']);
+
+        return redirect()->route('booking.create')
+            ->with('booking_success', 'Your booking request has been submitted successfully.')
+            ->with('booked_details', [
+                'id' => $booking->id,
+                'room_name' => $room->name,
+                'room_type' => $room->type,
+                'check_in' => $checkIn->format('Y-m-d'),
+                'check_out' => $checkOut->format('Y-m-d'),
+                'nights' => $nights,
+                'total_price' => $totalPrice,
+                'name' => $booking->name,
+                'email' => $booking->email,
+                'guests' => $booking->guests,
+            ]);
     }
 }

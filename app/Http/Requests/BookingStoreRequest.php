@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Models\Booking;
+use App\Models\Room;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class BookingStoreRequest extends FormRequest
@@ -18,7 +20,7 @@ class BookingStoreRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -30,6 +32,7 @@ class BookingStoreRequest extends FormRequest
             'check_in' => ['required', 'date', 'after_or_equal:today'],
             'check_out' => ['required', 'date', 'after:check_in'],
             'guests' => ['required', 'integer', 'min:1'],
+            'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }
 
@@ -47,19 +50,29 @@ class BookingStoreRequest extends FormRequest
                     ->where(function ($query) use ($checkIn, $checkOut) {
                         $query->where(function ($q) use ($checkIn, $checkOut) {
                             $q->where('check_in', '>=', $checkIn)
-                              ->where('check_in', '<', $checkOut);
+                                ->where('check_in', '<', $checkOut);
                         })->orWhere(function ($q) use ($checkIn, $checkOut) {
                             $q->where('check_out', '>', $checkIn)
-                              ->where('check_out', '<=', $checkOut);
+                                ->where('check_out', '<=', $checkOut);
                         })->orWhere(function ($q) use ($checkIn, $checkOut) {
                             $q->where('check_in', '<=', $checkIn)
-                              ->where('check_out', '>=', $checkOut);
+                                ->where('check_out', '>=', $checkOut);
                         });
                     })
                     ->exists();
 
                 if ($overlap) {
                     $validator->errors()->add('check_in', 'The selected room is not available for these dates.');
+                }
+            }
+
+            $roomId = $this->input('room_id');
+            $guests = (int) $this->input('guests');
+
+            if ($roomId && $guests) {
+                $room = Room::find($roomId);
+                if ($room && $guests > $room->max_guests) {
+                    $validator->errors()->add('guests', "The number of guests cannot exceed {$room->max_guests}.");
                 }
             }
         });
