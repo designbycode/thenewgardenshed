@@ -5,8 +5,12 @@ namespace App\Providers;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use App\Events\BookingCreated;
+use App\Listeners\SendAdminBookingNotification;
+use App\Listeners\SendClientBookingNotification;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +28,16 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        Event::listen(
+            BookingCreated::class,
+            [SendAdminBookingNotification::class, 'handle']
+        );
+
+        Event::listen(
+            BookingCreated::class,
+            [SendClientBookingNotification::class, 'handle']
+        );
     }
 
     /**

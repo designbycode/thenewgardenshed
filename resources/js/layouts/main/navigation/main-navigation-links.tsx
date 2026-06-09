@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { Calendar } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { navigationLinks } from '@/data/navigation-link';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import MainThemeToggle from '@/layouts/main/navigation/main-theme-toggle';
@@ -34,10 +34,16 @@ export default function MainNavigationLinks({ variant = 'desktop' }: Props) {
                         </Link>
                     ))}
                 </nav>
-                <Button className="h-11 w-full cursor-pointer font-bold uppercase">
+                <Link
+                    href="/bookings/create"
+                    className={cn(
+                        buttonVariants(),
+                        'h-11 w-full cursor-pointer font-bold uppercase',
+                    )}
+                >
                     <Calendar className="size-4" />
                     <span>Booking Now</span>
-                </Button>
+                </Link>
             </div>
         );
     }
@@ -64,12 +70,16 @@ export default function MainNavigationLinks({ variant = 'desktop' }: Props) {
             </div>
             <div className="hidden gap-6 lg:flex">
                 <MainThemeToggle />
-                <Button
-                    className={'h-11 cursor-pointer px-8 font-bold uppercase'}
+                <Link
+                    href="/bookings/create"
+                    className={cn(
+                        buttonVariants(),
+                        'h-11 cursor-pointer px-8 font-bold uppercase',
+                    )}
                 >
                     <Calendar className="size-4" />
                     <span>Booking Now</span>
-                </Button>
+                </Link>
             </div>
         </>
     );

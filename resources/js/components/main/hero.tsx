@@ -88,7 +88,7 @@ export default function HeroSection({ className }: HeroSectionProps) {
                         id="hero-actions"
                     >
                         <Button asChild size="lg">
-                            <Link href={contactUs()}>
+                            <Link href="/bookings/create">
                                 <Calendar size={15} className="mr-1" />
                                 <span>Book Your Retreat</span>
                             </Link>

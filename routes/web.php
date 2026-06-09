@@ -21,6 +21,9 @@ Route::post('/guest-book/create', [GuestBookCreateController::class, 'store'])->
 Route::get('/contact-us', ContactUsIndexController::class)->name('contact-us.index');
 Route::post('/contact-us', ContactUsStoreController::class)->name('contact-us.store');
 
+Route::get('/bookings/create', \App\Http\Controllers\BookingCreateController::class)->name('bookings.create');
+Route::post('/bookings', [\App\Http\Controllers\BookingController::class, 'store'])->name('bookings.store');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
 });

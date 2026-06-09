@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Form, Head, Link, usePage } from '@inertiajs/react';
 import {
     ArrowLeft,
     Bath,
@@ -9,25 +9,53 @@ import {
     ShieldCheck,
     Sparkles,
     Users,
+    LoaderCircle,
+    CheckCircle,
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import placeholderRoom from '@/../images/placeholder-room.png';
 import RoomImageCarousel from '@/components/rooms/room-image-carousel';
 import { Badge } from '@/components/ui/badge';
-import { buttonVariants } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import InputError from '@/components/input-error';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 import MainWrapper from '@/layouts/main/main-wrapper';
 import MainLayout from '@/layouts/main-layout';
 import { cn } from '@/lib/utils';
 import contactUs from '@/routes/contact-us';
 import { index as roomsIndex } from '@/routes/rooms';
+import { store as bookingStore } from '@/routes/bookings';
 import type { RoomItem } from '@/types/data';
 
 interface PageProps {
     room: RoomItem;
+    flash: {
+        booking_success?: string;
+    };
 }
 
 export default function RoomsShow({ room }: PageProps) {
+    const { flash } = usePage<PageProps>().props;
+    const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
+    const [successDialogOpen, setSuccessDialogOpen] = useState(!!flash?.booking_success);
+
+    useEffect(() => {
+        if (flash?.booking_success) {
+            setSuccessDialogOpen(true);
+            setBookingDialogOpen(false);
+        }
+    }, [flash]);
+
     useEffect(() => {
         document.title = `${room.name} | The New Garden Shed`;
         const meta = document.querySelector('meta[name="description"]');
@@ -228,7 +256,7 @@ export default function RoomsShow({ room }: PageProps) {
                             {/* Direct CTA Block */}
                             <div className="mt-8 border-t border-border pt-6">
                                 <Link
-                                    href={contactUs.index().url}
+                                    href={`/bookings/create?room_id=${room.id}`}
                                     className={cn(
                                         buttonVariants(),
                                         'flex w-full items-center justify-center gap-2 rounded-xl border-none bg-primary py-6 text-xs font-semibold tracking-widest text-primary-foreground uppercase shadow-lg shadow-primary/20 transition-all duration-300 hover:brightness-110 active:scale-[0.99] sm:text-sm',
@@ -243,6 +271,27 @@ export default function RoomsShow({ room }: PageProps) {
                                             .join(' ')}
                                     </span>
                                 </Link>
+
+                                <Dialog open={successDialogOpen} onOpenChange={setSuccessDialogOpen}>
+                                    <DialogContent className="sm:max-w-md">
+                                        <DialogHeader>
+                                            <div className="mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                                                <CheckCircle size={32} className="text-primary" />
+                                            </div>
+                                            <DialogTitle className="text-center text-xl">Booking Requested!</DialogTitle>
+                                            <DialogDescription className="text-center">
+                                                {flash?.booking_success || 'Your booking request has been submitted successfully. We will contact you shortly.'}
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <Button
+                                            onClick={() => setSuccessDialogOpen(false)}
+                                            className="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary py-5.5 text-xs font-semibold tracking-widest text-primary-foreground uppercase transition-colors hover:bg-primary/90"
+                                        >
+                                            <span>Close</span>
+                                        </Button>
+                                    </DialogContent>
+                                </Dialog>
+
                                 <span className="mt-2.5 block text-center font-sans text-[10px] text-muted-foreground">
                                     No immediate payment required. Secure
                                     booking estimate submitted instantly.
