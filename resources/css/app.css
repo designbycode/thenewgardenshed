@@ -242,11 +242,15 @@
     }
 
     body {
-        @apply bg-red-600 text-foreground selection:bg-primary/20;
+        @apply bg-background text-foreground selection:bg-primary/20;
     }
 
     html {
         @apply font-sans;
+    }
+
+    img {
+        @apply grayscale-75;
     }
 }
 

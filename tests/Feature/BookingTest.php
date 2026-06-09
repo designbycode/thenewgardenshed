@@ -64,6 +64,43 @@ class BookingTest extends TestCase
         $this->assertDatabaseCount('bookings', 1);
     }
 
+    public function test_booking_is_rejected_when_system_disabled(): void
+    {
+        config(['app.booking_system_enabled' => false]);
+
+        $room = Room::factory()->create(['price_per_night' => 1000]);
+
+        $response = $this->post(route('bookings.store'), [
+            'room_id' => $room->id,
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'check_in' => now()->addDay()->format('Y-m-d'),
+            'check_out' => now()->addDays(3)->format('Y-m-d'),
+            'guests' => 2,
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_booking_succeeds_when_system_enabled(): void
+    {
+        config(['app.booking_system_enabled' => true]);
+
+        $room = Room::factory()->create(['price_per_night' => 1000]);
+
+        $response = $this->post(route('bookings.store'), [
+            'room_id' => $room->id,
+            'name' => 'Jane Doe',
+            'email' => 'jane@example.com',
+            'check_in' => now()->addDay()->format('Y-m-d'),
+            'check_out' => now()->addDays(3)->format('Y-m-d'),
+            'guests' => 2,
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertDatabaseHas('bookings', ['email' => 'jane@example.com']);
+    }
+
     public function test_admin_can_update_booking_status(): void
     {
         $user = User::factory()->create();
