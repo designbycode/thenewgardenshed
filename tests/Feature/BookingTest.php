@@ -12,6 +12,12 @@ class BookingTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        config(['app.booking_system_enabled' => true]);
+    }
+
     public function test_user_can_request_a_booking(): void
     {
         $room = Room::factory()->create(['price_per_night' => 1000]);
@@ -84,8 +90,6 @@ class BookingTest extends TestCase
 
     public function test_booking_succeeds_when_system_enabled(): void
     {
-        config(['app.booking_system_enabled' => true]);
-
         $room = Room::factory()->create(['price_per_night' => 1000]);
 
         $response = $this->post(route('bookings.store'), [
@@ -153,7 +157,6 @@ class BookingTest extends TestCase
 
     public function test_booking_rejects_notes_exceeding_max_length(): void
     {
-        config(['app.booking_system_enabled' => true]);
         $room = Room::factory()->create(['price_per_night' => 1000]);
 
         $response = $this->post(route('bookings.store'), [
@@ -171,7 +174,6 @@ class BookingTest extends TestCase
 
     public function test_booking_succeeds_with_valid_notes(): void
     {
-        config(['app.booking_system_enabled' => true]);
         $room = Room::factory()->create(['price_per_night' => 1000]);
 
         $response = $this->post(route('bookings.store'), [
