@@ -153,6 +153,7 @@ class BookingTest extends TestCase
 
     public function test_booking_rejects_notes_exceeding_max_length(): void
     {
+        config(['app.booking_system_enabled' => true]);
         $room = Room::factory()->create(['price_per_night' => 1000]);
 
         $response = $this->post(route('bookings.store'), [
