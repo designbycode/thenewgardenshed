@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Booking;
+use App\Models\Room;
 use Illuminate\Foundation\Http\FormRequest;
 
 class BookingStoreRequest extends FormRequest
@@ -60,6 +61,16 @@ class BookingStoreRequest extends FormRequest
 
                 if ($overlap) {
                     $validator->errors()->add('check_in', 'The selected room is not available for these dates.');
+                }
+            }
+
+            $roomId = $this->input('room_id');
+            $guests = (int) $this->input('guests');
+
+            if ($roomId && $guests) {
+                $room = Room::find($roomId);
+                if ($room && $guests > $room->max_guests) {
+                    $validator->errors()->add('guests', "The number of guests cannot exceed {$room->max_guests}.");
                 }
             }
         });

@@ -5,7 +5,10 @@ namespace Tests\Feature;
 use App\Models\Room;
 use App\Models\User;
 use App\Models\Booking;
+use App\Mail\ClientBookingNotification;
+use App\Mail\AdminBookingNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class BookingTest extends TestCase
@@ -99,6 +102,39 @@ class BookingTest extends TestCase
 
         $response->assertStatus(302);
         $this->assertDatabaseHas('bookings', ['email' => 'jane@example.com']);
+    }
+
+    public function test_booking_rejected_when_guests_exceed_capacity(): void
+    {
+        $room = Room::factory()->create(['price_per_night' => 1000, 'max_guests' => 2]);
+
+        $response = $this->post(route('bookings.store'), [
+            'room_id' => $room->id,
+            'name' => 'Group Booking',
+            'email' => 'group@example.com',
+            'check_in' => now()->addDay()->format('Y-m-d'),
+            'check_out' => now()->addDays(3)->format('Y-m-d'),
+            'guests' => 5,
+        ]);
+
+        $response->assertSessionHasErrors(['guests']);
+    }
+
+    public function test_booking_succeeds_when_guests_within_capacity(): void
+    {
+        $room = Room::factory()->create(['price_per_night' => 1000, 'max_guests' => 4]);
+
+        $response = $this->post(route('bookings.store'), [
+            'room_id' => $room->id,
+            'name' => 'Small Group',
+            'email' => 'small@example.com',
+            'check_in' => now()->addDay()->format('Y-m-d'),
+            'check_out' => now()->addDays(3)->format('Y-m-d'),
+            'guests' => 4,
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertDatabaseHas('bookings', ['email' => 'small@example.com']);
     }
 
     public function test_admin_can_update_booking_status(): void
