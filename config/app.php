@@ -125,4 +125,6 @@ return [
 
     'review_page_password' => env('REVIEW_PAGE_PASSWORD'),
 
+    'booking_system_enabled' => env('BOOKING_SYSTEM_ENABLED', true),
+
 ];

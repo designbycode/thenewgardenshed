@@ -104,7 +104,7 @@ export default function AdminRoomsCreate({
 
                             <div className="grid gap-2">
                                 <Label htmlFor="price_per_night">
-                                    Price per Night ($)
+                                    Price per Night (R)
                                 </Label>
                                 <Input
                                     id="price_per_night"

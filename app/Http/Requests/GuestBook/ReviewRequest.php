@@ -34,16 +34,19 @@ class ReviewRequest extends FormRequest
             'review' => ['required', 'string', 'max:5000'],
             'suggestions' => ['nullable', 'string', 'max:2000'],
             'would_recommend' => ['required', 'boolean'],
-            'password' => ['required', 'string'],
         ];
     }
 
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            $expected = config('app.review_page_password');
-            if ($this->input('password') !== $expected) {
-                $validator->errors()->add('password', 'The review page password is incorrect.');
+            if ($this->input('action') === 'verify') {
+                $expected = config('app.review_page_password');
+                if ($this->input('password') !== $expected) {
+                    $validator->errors()->add('password', 'The review page password is incorrect.');
+                }
+            } elseif (!$this->session()->get('review_authenticated')) {
+                $validator->errors()->add('password', 'Session expired. Please re-verify.');
             }
         });
     }
