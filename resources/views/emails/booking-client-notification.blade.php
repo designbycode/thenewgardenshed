@@ -1,30 +1,63 @@
 @component('mail::message')
-# 🌿 The Garden Shed
+# 🌿 Booking Request Received
 
-**Hi {{ $booking->name }}, thank you for your booking request!**
+Hi {{ $booking->name }},
+
+Thank you for your interest in **The Garden Shed**. We have received your booking request and our team is currently processing it. Here are the details of your requested stay:
 
 ---
 
-We've received your booking request for **{{ $booking->room->name }}**. Here's a summary:
+## 🛏️ Accommodation Details
 
-**Check-in:** {{ $booking->check_in->toFormattedDateString() }}
-**Check-out:** {{ $booking->check_out->toFormattedDateString() }}
-**Guests:** {{ $booking->guests }}
-@if($booking->notes)
-**Notes:** {{ $booking->notes }}
+@if($booking->room->getFirstMediaUrl('images', 'card'))
+<img src="{{ $booking->room->getFirstMediaUrl('images', 'card') }}" alt="{{ $booking->room->name }}" style="width: 100%; max-width: 600px; height: auto; border-radius: 12px; margin: 15px 0; border: 1px solid #e2e8f0; display: block;" />
 @endif
-**Total:** R {{ number_format($booking->total_price, 2) }}
 
-**Status:** {{ ucfirst($booking->status) }}
+### **{{ $booking->room->name }}**
+*{{ $booking->room->type }} Suite*
 
 ---
 
-Our team will review your request and get back to you shortly. If you have any questions in the meantime, feel free to reply to this email or call us.
+## 📅 Stay Information
 
-@component('mail::button', ['url' => config('app.url')])
-Visit The Garden Shed
+@component('mail::panel')
+**Check-in:** {{ $booking->check_in->toFormattedDateString() }} (from 14:00)  
+**Check-out:** {{ $booking->check_out->toFormattedDateString() }} (by 10:00)  
+**Duration:** {{ $booking->check_in->diffInDays($booking->check_out) }} {{ Str::plural('night', $booking->check_in->diffInDays($booking->check_out)) }}  
+**Number of Guests:** {{ $booking->guests }} {{ Str::plural('guest', $booking->guests) }}
 @endcomponent
 
-Warm regards,<br>
+---
+
+## 👤 Guest Information
+
+* **Full Name:** {{ $booking->name }}
+* **Email Address:** {{ $booking->email }}
+* **Phone Number:** {{ $booking->phone ?? 'Not provided' }}
+
+@if($booking->notes)
+### **Special Requests / Notes:**
+> {{ $booking->notes }}
+@endif
+
+---
+
+## 💳 Estimated Price Breakdown
+
+* **Price per night:** R {{ number_format($booking->room->price_per_night, 2) }}
+* **Nights:** {{ $booking->check_in->diffInDays($booking->check_out) }}
+* **Total Estimated Cost:** **R {{ number_format($booking->total_price, 2) }}**
+
+**Current Status:** `{{ ucfirst($booking->status) }}`
+
+---
+
+Our team will review your request and send a confirmation email shortly. If you need to make any changes or have questions, please feel free to reply directly to this email.
+
+@component('mail::button', ['url' => config('app.url')])
+Go to Website
+@endcomponent
+
+Warm regards,  
 **The Garden Shed Team**
 @endcomponent

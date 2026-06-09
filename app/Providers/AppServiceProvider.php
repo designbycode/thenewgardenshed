@@ -29,15 +29,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
 
-        Event::listen(
-            BookingCreated::class,
-            [SendAdminBookingNotification::class, 'handle']
-        );
-
-        Event::listen(
-            BookingCreated::class,
-            [SendClientBookingNotification::class, 'handle']
-        );
+        // Event listeners are automatically discovered by Laravel 19/11 from the Listeners folder.
     }
 
     /**

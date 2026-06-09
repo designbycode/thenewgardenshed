@@ -1,10 +1,12 @@
 import { Link } from '@inertiajs/react';
 import { Calendar } from 'lucide-react';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import { navigationLinks } from '@/data/navigation-link';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import MainThemeToggle from '@/layouts/main/navigation/main-theme-toggle';
 import { cn } from '@/lib/utils';
+
+import { create as createBooking } from '@/routes/booking';
 
 type Props = {
     variant?: 'desktop' | 'mobile';
@@ -35,7 +37,7 @@ export default function MainNavigationLinks({ variant = 'desktop' }: Props) {
                     ))}
                 </nav>
                 <Link
-                    href="/rooms"
+                    href={createBooking()}
                     className={cn(
                         buttonVariants(),
                         'h-11 w-full cursor-pointer font-bold uppercase',
@@ -71,7 +73,7 @@ export default function MainNavigationLinks({ variant = 'desktop' }: Props) {
             <div className="hidden gap-6 lg:flex">
                 <MainThemeToggle />
                 <Link
-                    href="/rooms"
+                    href={createBooking()}
                     className={cn(
                         buttonVariants(),
                         'h-11 cursor-pointer px-8 font-bold uppercase',

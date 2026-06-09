@@ -45,6 +45,11 @@ class Room extends Model implements HasMedia
         return $this->belongsToMany(Amenity::class);
     }
 
+    public function bookings(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Booking::class);
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);

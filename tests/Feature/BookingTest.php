@@ -241,7 +241,7 @@ class BookingTest extends TestCase
         );
     }
 
-    public function test_booking_stores_redirects_to_room_show(): void
+    public function test_booking_stores_redirects_to_booking_create(): void
     {
         $room = Room::factory()->create(['price_per_night' => 1000, 'max_guests' => 4]);
 
@@ -254,6 +254,8 @@ class BookingTest extends TestCase
             'guests' => 2,
         ]);
 
-        $response->assertRedirect(route('rooms.show', $room));
+        $response->assertRedirect(route('booking.create'));
+        $response->assertSessionHas('booking_success');
+        $response->assertSessionHas('booked_details');
     }
 }

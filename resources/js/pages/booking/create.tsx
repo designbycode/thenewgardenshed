@@ -1,249 +1,298 @@
-import { Form, Head, usePage } from '@inertiajs/react';
-import { CalendarCheck, LoaderCircle } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import placeholderRoom from '@/../images/placeholder-room.png';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import InputError from '@/components/input-error';
+import type { PageProps } from '@inertiajs/core';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { Calendar } from 'lucide-react';
+import { useState } from 'react';
+import BookingForm from '@/components/booking/booking-form';
+import BookingPreview from '@/components/booking/booking-preview';
+import DateRangePickerCalendar from '@/components/booking/date-range-picker-calendar';
+import RoomSelectDropdown from '@/components/booking/room-select-dropdown';
+import HeadingBlock from '@/components/typography/heading-block';
+import roomsRoute from '@/routes/rooms';
+import bookingRoute from '@/routes/booking';
 import MainWrapper from '@/layouts/main/main-wrapper';
 import MainLayout from '@/layouts/main-layout';
-import { store as bookingStore } from '@/routes/bookings';
 import type { RoomItem } from '@/types/data';
 
-interface BookingCreatePageProps {
+interface BookingCreatePageProps extends PageProps {
     rooms: RoomItem[];
     preselectedRoomId: number | null;
+    flash: {
+        toast: { type: 'success' | 'error' | 'info'; message: string } | null;
+        booking_success?: string | null;
+        booked_details?: {
+            id: number;
+            room_name: string;
+            room_type: string;
+            check_in: string;
+            check_out: string;
+            nights: number;
+            total_price: number;
+            name: string;
+            email: string;
+            guests: number;
+        } | null;
+    };
 }
 
 export default function BookingCreate() {
-    const { rooms, preselectedRoomId } = usePage<BookingCreatePageProps>().props;
+    const {
+        rooms,
+        preselectedRoomId,
+        errors: pageErrors,
+        flash,
+    } = usePage<BookingCreatePageProps>().props;
     const [selectedRoom, setSelectedRoom] = useState<RoomItem | null>(
         rooms.find((r) => r.id === preselectedRoomId) ?? null,
     );
+    const [checkIn, setCheckIn] = useState('');
+    const [checkOut, setCheckOut] = useState('');
 
-    useEffect(() => {
-        document.title = 'Book a Room | The New Garden Shed';
-    }, []);
+    let nights = 0;
+    let totalCost = 0;
+
+    if (checkIn && checkOut && selectedRoom) {
+        const start = new Date(checkIn);
+        const end = new Date(checkOut);
+        const timeDiff = end.getTime() - start.getTime();
+
+        if (timeDiff > 0) {
+            nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            totalCost = nights * selectedRoom.pricePerNight;
+        }
+    }
+
+    const formatDate = (dateStr: string) => {
+        if (!dateStr) {
+            return '';
+        }
+
+        const d = new Date(dateStr);
+
+        return d.toLocaleDateString('en-ZA', {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+        });
+    };
+
+    const handleDateSelect = (start: string, end: string) => {
+        setCheckIn(start);
+        setCheckOut(end);
+    };
 
     return (
         <>
             <Head title="Book a Room" />
             <MainWrapper className="py-12">
-                <div className="mb-10">
-                    <h1 className="font-serif text-3xl font-light text-foreground sm:text-4xl">
-                        Book a Room
-                    </h1>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                        Select a room and fill in your details to submit a booking request.
-                    </p>
-                </div>
+                {flash?.booking_success && flash?.booked_details ? (
+                    <div className="mx-auto max-w-2xl py-8 text-center">
+                        <div className="mb-6 flex justify-center">
+                            <div className="rounded-full bg-primary/10 p-4 text-primary">
+                                <Calendar className="h-12 w-12" />
+                            </div>
+                        </div>
 
-                <section className="mb-12">
-                    <h2 className="mb-6 font-serif text-xl font-normal text-foreground">
-                        Select a Room
-                    </h2>
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {rooms.map((room) => (
-                            <Card
-                                key={room.id}
-                                className={`cursor-pointer overflow-hidden py-0 transition-all duration-200 hover:shadow-lg ${
-                                    selectedRoom?.id === room.id
-                                        ? 'ring-2 ring-primary ring-offset-2'
-                                        : 'ring-1 ring-transparent hover:ring-1 hover:ring-border'
-                                }`}
-                                onClick={() => setSelectedRoom(room)}
-                            >
-                                <div className="relative aspect-video overflow-hidden">
-                                    <img
-                                        src={room.cardImage ?? room.thumbnail ?? placeholderRoom}
-                                        alt={room.name}
-                                        className="h-full w-full object-cover"
-                                    />
-                                    <div className="absolute top-3 left-3">
-                                        <Badge className="rounded-md border-border bg-background/80 px-2.5 py-1 text-[10px] font-bold tracking-wider text-foreground uppercase shadow-sm backdrop-blur-md">
-                                            {room.type} Suite
-                                        </Badge>
-                                    </div>
-                                    <div className="absolute right-3 bottom-3 rounded-lg border border-border bg-card/90 px-3 py-1.5 text-base font-semibold text-primary shadow-sm backdrop-blur-md">
-                                        R {room.pricePerNight}{' '}
-                                        <span className="text-xs font-normal text-muted-foreground">/ night</span>
-                                    </div>
-                                </div>
-                                <div className="p-4">
-                                    <h3 className="font-serif text-lg font-normal text-foreground">
-                                        {room.name}
-                                    </h3>
-                                    <p className="mt-1 text-xs text-muted-foreground">
-                                        Up to {room.capacity} guests • {room.bedType}
-                                    </p>
-                                </div>
-                            </Card>
-                        ))}
-                    </div>
-                </section>
+                        <HeadingBlock
+                            heading="Thank You!"
+                            headingLevel={1}
+                            description="Your booking request has been submitted successfully."
+                            className="text-center"
+                        />
 
-                <section>
-                    <h2 className="mb-6 font-serif text-xl font-normal text-foreground">
-                        Your Details
-                    </h2>
-                    {selectedRoom ? (
-                        <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
-                            <div className="mb-6 flex items-center gap-4 border-b border-border pb-4">
-                                <img
-                                    src={selectedRoom.cardImage ?? selectedRoom.thumbnail ?? placeholderRoom}
-                                    alt={selectedRoom.name}
-                                    className="h-16 w-24 rounded-lg object-cover"
-                                />
+                        <div className="mt-8 space-y-6 rounded-2xl border border-border bg-card p-6 text-left shadow-md sm:p-8">
+                            <h3 className="border-b border-border pb-4 font-serif text-lg font-medium">
+                                Booking Summary
+                            </h3>
+
+                            <div className="grid grid-cols-1 gap-6 text-sm sm:grid-cols-2">
                                 <div>
-                                    <p className="font-serif text-lg font-medium text-foreground">
-                                        {selectedRoom.name}
+                                    <span className="text-xs tracking-wider text-muted-foreground uppercase">
+                                        Room
+                                    </span>
+                                    <p className="mt-0.5 font-serif text-base font-medium text-foreground">
+                                        {flash.booked_details.room_name}
                                     </p>
-                                    <p className="text-xs text-muted-foreground">
-                                        R {selectedRoom.pricePerNight} / night • Up to {selectedRoom.maxGuests} guests
+                                    <p className="text-xs text-muted-foreground capitalize">
+                                        {flash.booked_details.room_type} Suite
+                                    </p>
+                                </div>
+                                <div>
+                                    <span className="text-xs tracking-wider text-muted-foreground uppercase">
+                                        Guests
+                                    </span>
+                                    <p className="mt-0.5 font-medium text-foreground">
+                                        {flash.booked_details.guests}{' '}
+                                        {flash.booked_details.guests === 1
+                                            ? 'Guest'
+                                            : 'Guests'}
+                                    </p>
+                                </div>
+                                <div>
+                                    <span className="text-xs tracking-wider text-muted-foreground uppercase">
+                                        Check-in
+                                    </span>
+                                    <p className="mt-0.5 font-medium text-foreground">
+                                        {formatDate(
+                                            flash.booked_details.check_in,
+                                        )}
+                                    </p>
+                                </div>
+                                <div>
+                                    <span className="text-xs tracking-wider text-muted-foreground uppercase">
+                                        Check-out
+                                    </span>
+                                    <p className="mt-0.5 font-medium text-foreground">
+                                        {formatDate(
+                                            flash.booked_details.check_out,
+                                        )}
+                                    </p>
+                                </div>
+                                <div>
+                                    <span className="text-xs tracking-wider text-muted-foreground uppercase">
+                                        Duration
+                                    </span>
+                                    <p className="mt-0.5 font-medium text-foreground">
+                                        {flash.booked_details.nights}{' '}
+                                        {flash.booked_details.nights === 1
+                                            ? 'night'
+                                            : 'nights'}
+                                    </p>
+                                </div>
+                                <div>
+                                    <span className="text-xs tracking-wider text-muted-foreground uppercase">
+                                        Total Estimate
+                                    </span>
+                                    <p className="mt-0.5 font-serif text-2xl font-bold text-primary">
+                                        R{' '}
+                                        {flash.booked_details.total_price.toLocaleString(
+                                            'en-ZA',
+                                            { minimumFractionDigits: 2 },
+                                        )}
                                     </p>
                                 </div>
                             </div>
 
-                            <Form
-                                {...bookingStore.form()}
-                                data={{
-                                    room_id: selectedRoom.id,
-                                    name: '',
-                                    email: '',
-                                    phone: '',
-                                    guests: 1,
-                                    check_in: '',
-                                    check_out: '',
-                                    notes: '',
-                                }}
-                                className="space-y-4"
+                            <div className="rounded-xl border border-border/50 bg-muted/50 p-4 text-xs text-muted-foreground">
+                                <p className="leading-relaxed">
+                                    We have received the request for{' '}
+                                    <strong>{flash.booked_details.name}</strong>{' '}
+                                    ({flash.booked_details.email}). A team
+                                    member will review your request and contact
+                                    you shortly to confirm availability and
+                                    finalize details.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
+                            <Link
+                                prefetch={true}
+                                href={roomsRoute.index()}
+                                className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold tracking-wide text-primary-foreground shadow transition-colors hover:bg-primary/90"
                             >
-                                {({ processing, errors, data, setData }) => (
-                                    <>
-                                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                            <div className="space-y-1.5">
-                                                <Label htmlFor="name">Your Name</Label>
-                                                <Input
-                                                    id="name"
-                                                    name="name"
-                                                    value={data.name}
-                                                    onChange={(e) => setData('name', e.target.value)}
-                                                    placeholder="John Doe"
-                                                    required
-                                                />
-                                                <InputError message={errors.name} />
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <Label htmlFor="email">Email Address</Label>
-                                                <Input
-                                                    type="email"
-                                                    id="email"
-                                                    name="email"
-                                                    value={data.email}
-                                                    onChange={(e) => setData('email', e.target.value)}
-                                                    placeholder="john@example.com"
-                                                    required
-                                                />
-                                                <InputError message={errors.email} />
-                                            </div>
-                                        </div>
+                                Browse Other Rooms
+                            </Link>
+                            <Link
+                                prefetch={true}
+                                href={bookingRoute.create()}
+                                className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-border bg-background px-6 py-3 text-sm font-semibold tracking-wide text-foreground shadow-sm transition-colors hover:bg-muted"
+                            >
+                                Make Another Booking
+                            </Link>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
+                        {/* Left column: forms and main headings */}
+                        <div className="space-y-12 lg:col-span-2">
+                            <HeadingBlock
+                                badge={{
+                                    text: 'Booking',
+                                    icon: Calendar,
+                                }}
+                                heading="Book a Room"
+                                headingLevel={1}
+                                description="Select a room and fill in your details to submit a booking request."
+                            />
 
-                                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                            <div className="space-y-1.5">
-                                                <Label htmlFor="phone">Phone Number (Optional)</Label>
-                                                <Input
-                                                    id="phone"
-                                                    name="phone"
-                                                    value={data.phone}
-                                                    onChange={(e) => setData('phone', e.target.value)}
-                                                    placeholder="+27 12 345 6789"
-                                                />
-                                                <InputError message={errors.phone} />
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <Label htmlFor="guests">Number of Guests</Label>
-                                                <Input
-                                                    type="number"
-                                                    id="guests"
-                                                    name="guests"
-                                                    value={data.guests}
-                                                    onChange={(e) => setData('guests', parseInt(e.target.value) || 0)}
-                                                    min="1"
-                                                    max={selectedRoom.maxGuests}
-                                                    required
-                                                />
-                                                <InputError message={errors.guests} />
-                                            </div>
-                                        </div>
+                            <section>
+                                <h2 className="mb-6 font-serif text-xl font-normal text-foreground">
+                                    Select a Room
+                                </h2>
+                                <RoomSelectDropdown
+                                    rooms={rooms}
+                                    selectedRoom={selectedRoom}
+                                    onSelectRoom={setSelectedRoom}
+                                />
+                            </section>
 
-                                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                            <div className="space-y-1.5">
-                                                <Label htmlFor="check_in">Check-in Date</Label>
-                                                <Input
-                                                    type="date"
-                                                    id="check_in"
-                                                    name="check_in"
-                                                    value={data.check_in}
-                                                    onChange={(e) => setData('check_in', e.target.value)}
-                                                    required
-                                                />
-                                                <InputError message={errors.check_in} />
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <Label htmlFor="check_out">Check-out Date</Label>
-                                                <Input
-                                                    type="date"
-                                                    id="check_out"
-                                                    name="check_out"
-                                                    value={data.check_out}
-                                                    onChange={(e) => setData('check_out', e.target.value)}
-                                                    required
-                                                />
-                                                <InputError message={errors.check_out} />
-                                            </div>
-                                        </div>
+                            {selectedRoom ? (
+                                <>
+                                    <DateRangePickerCalendar
+                                        checkIn={checkIn}
+                                        checkOut={checkOut}
+                                        selectedRoom={selectedRoom}
+                                        pageErrors={pageErrors}
+                                        formatDate={formatDate}
+                                        nights={nights}
+                                        onDateSelect={handleDateSelect}
+                                    />
 
-                                        <div className="space-y-1.5">
-                                            <Label htmlFor="notes">Dietary Needs or Questions (Optional)</Label>
-                                            <Textarea
-                                                id="notes"
-                                                name="notes"
-                                                value={data.notes}
-                                                onChange={(e) => setData('notes', e.target.value)}
-                                                placeholder="Let us know about any dietary requirements, allergies, or special requests..."
-                                                rows={3}
+                                    <div>
+                                        <h2 className="mb-6 font-serif text-xl font-normal text-foreground">
+                                            Your Details
+                                        </h2>
+                                        <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+                                            <BookingForm
+                                                selectedRoom={selectedRoom}
+                                                checkIn={checkIn}
+                                                checkOut={checkOut}
                                             />
-                                            <InputError message={errors.notes} />
                                         </div>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="rounded-2xl border border-dashed border-border bg-muted/50 p-12 text-center">
+                                    <p className="text-sm text-muted-foreground">
+                                        Please select a room above to configure
+                                        check-in/check-out dates and fill in
+                                        your details.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
 
-                                        <Button
-                                            type="submit"
-                                            disabled={processing}
-                                            className="mt-4 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary py-6 text-xs font-semibold tracking-widest text-primary-foreground uppercase transition-colors hover:bg-primary/90 disabled:opacity-60"
-                                        >
-                                            {processing ? (
-                                                <LoaderCircle size={14} className="animate-spin" />
-                                            ) : (
-                                                <CalendarCheck size={14} />
-                                            )}
-                                            <span>{processing ? 'Processing...' : 'Submit Booking Request'}</span>
-                                        </Button>
-                                    </>
-                                )}
-                            </Form>
+                        {/* Right column: sticky preview or placeholder */}
+                        <div className="space-y-6 lg:sticky lg:top-36">
+                            {selectedRoom ? (
+                                <BookingPreview
+                                    selectedRoom={selectedRoom}
+                                    checkIn={checkIn}
+                                    checkOut={checkOut}
+                                    nights={nights}
+                                    totalCost={totalCost}
+                                    formatDate={formatDate}
+                                />
+                            ) : (
+                                <div className="overflow-hidden rounded-2xl border border-border bg-card/60 shadow-sm">
+                                    <div className="relative flex aspect-16/10 flex-col items-center justify-center border-b border-border bg-muted/40 text-muted-foreground">
+                                        <span className="font-serif text-base font-light">
+                                            No Room Selected
+                                        </span>
+                                    </div>
+                                    <div className="p-6 text-center text-muted-foreground">
+                                        <p className="text-sm">
+                                            Choose a room from the selector on
+                                            the left to see room details, rates,
+                                            and stay summary.
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                    ) : (
-                        <div className="rounded-2xl border border-dashed border-border bg-muted/50 p-12 text-center">
-                            <p className="text-sm text-muted-foreground">
-                                Select a room above to start your booking.
-                            </p>
-                        </div>
-                    )}
-                </section>
+                    </div>
+                )}
             </MainWrapper>
         </>
     );

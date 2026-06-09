@@ -1,4 +1,5 @@
 import { Form, usePage } from '@inertiajs/react';
+import type { PageProps } from '@inertiajs/core';
 import {
     CheckCircle,
     LoaderCircle,
@@ -27,11 +28,11 @@ import MainWrapper from '@/layouts/main/main-wrapper';
 import MainLayout from '@/layouts/main-layout';
 import { create, store } from '@/routes/guest-book';
 
-interface CreatePageProps {
+interface CreatePageProps extends PageProps {
     review_authenticated: boolean;
     flash: {
         review_created?: boolean;
-    };
+    } & PageProps['flash'];
 }
 
 const RATING_CATEGORIES = [
@@ -84,6 +85,14 @@ export default function GuestBookCreate() {
     const { review_authenticated, flash } = usePage<CreatePageProps>().props;
     const [passwordDialogOpen, setPasswordDialogOpen] = useState(!review_authenticated);
     const [successDialogOpen, setSuccessDialogOpen] = useState(!!flash?.review_created);
+    const [ratings, setRatings] = useState<Record<string, number>>({
+        overall_rating: 0,
+        cleanliness_rating: 0,
+        comfort_rating: 0,
+        service_rating: 0,
+        location_rating: 0,
+        value_rating: 0,
+    });
 
     return (
         <MainWrapper className="py-18">
@@ -113,13 +122,13 @@ export default function GuestBookCreate() {
                     </DialogHeader>
                     <Form
                         {...store.form()}
-                        data={{ action: 'verify', password: '' }}
                         resetOnSuccess={['password']}
                         onSuccess={() => setPasswordDialogOpen(false)}
                         className="space-y-4"
                     >
-                        {({ processing, errors, data, setData }) => (
+                        {({ processing, errors }) => (
                             <>
+                                <input type="hidden" name="action" value="verify" />
                                 <div className="space-y-1.5">
                                     <Label htmlFor="password" className="text-xs font-semibold text-muted-foreground">
                                         Password
@@ -128,8 +137,6 @@ export default function GuestBookCreate() {
                                         type="password"
                                         id="password"
                                         name="password"
-                                        value={data.password}
-                                        onChange={(e) => setData('password', e.target.value)}
                                         placeholder="Enter password"
                                     />
                                     <InputError message={errors.password} />
@@ -161,26 +168,10 @@ export default function GuestBookCreate() {
 
                         <Form
                             {...store.form()}
-                            data={{
-                                name: '',
-                                email: '',
-                                country: '',
-                                room_number: '',
-                                stay_date: '',
-                                overall_rating: 0,
-                                cleanliness_rating: 0,
-                                comfort_rating: 0,
-                                service_rating: 0,
-                                location_rating: 0,
-                                value_rating: 0,
-                                review: '',
-                                suggestions: '',
-                                would_recommend: false
-                            }}
                             className="space-y-6"
                             resetOnSuccess
                         >
-                            {({ processing, errors, data, setData }) => (
+                            {({ processing, errors }) => (
                                 <>
                                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                         <div className="space-y-1.5">
@@ -191,8 +182,6 @@ export default function GuestBookCreate() {
                                                 type="text"
                                                 id="name"
                                                 name="name"
-                                                value={data.name}
-                                                onChange={(e) => setData('name', e.target.value)}
                                                 placeholder="e.g. Jane Doe"
                                             />
                                             <InputError message={errors.name} />
@@ -205,8 +194,6 @@ export default function GuestBookCreate() {
                                                 type="email"
                                                 id="email"
                                                 name="email"
-                                                value={data.email}
-                                                onChange={(e) => setData('email', e.target.value)}
                                                 placeholder="e.g. jane@example.com"
                                             />
                                             <InputError message={errors.email} />
@@ -222,8 +209,6 @@ export default function GuestBookCreate() {
                                                 type="text"
                                                 id="country"
                                                 name="country"
-                                                value={data.country}
-                                                onChange={(e) => setData('country', e.target.value)}
                                                 placeholder="e.g. South Africa"
                                             />
                                             <InputError message={errors.country} />
@@ -236,8 +221,6 @@ export default function GuestBookCreate() {
                                                 type="text"
                                                 id="room_number"
                                                 name="room_number"
-                                                value={data.room_number}
-                                                onChange={(e) => setData('room_number', e.target.value)}
                                                 placeholder="e.g. Suite 3"
                                             />
                                             <InputError message={errors.room_number} />
@@ -252,8 +235,6 @@ export default function GuestBookCreate() {
                                             type="text"
                                             id="stay_date"
                                             name="stay_date"
-                                            value={data.stay_date}
-                                            onChange={(e) => setData('stay_date', e.target.value)}
                                             placeholder="e.g. June 2026"
                                         />
                                         <InputError message={errors.stay_date} />
@@ -276,14 +257,14 @@ export default function GuestBookCreate() {
                                                                 type="radio"
                                                                 name={key}
                                                                 value={val}
-                                                                checked={data[key] === val}
+                                                                checked={ratings[key] === val}
                                                                 className="sr-only"
-                                                                onChange={() => setData(key as any, val)}
+                                                                onChange={() => setRatings(prev => ({ ...prev, [key]: val }))}
                                                             />
                                                             <Star
                                                                 size={20}
                                                                 className={
-                                                                    val <= data[key]
+                                                                    val <= ratings[key]
                                                                         ? 'fill-yellow-500 text-yellow-500'
                                                                         : 'fill-muted text-muted-foreground/30'
                                                                 }
@@ -303,8 +284,6 @@ export default function GuestBookCreate() {
                                         <Textarea
                                             id="review"
                                             name="review"
-                                            value={data.review}
-                                            onChange={(e) => setData('review', e.target.value)}
                                             placeholder="Tell us about your experience..."
                                             className="min-h-32"
                                             rows={4}
@@ -319,8 +298,6 @@ export default function GuestBookCreate() {
                                         <Textarea
                                             id="suggestions"
                                             name="suggestions"
-                                            value={data.suggestions}
-                                            onChange={(e) => setData('suggestions', e.target.value)}
                                             placeholder="Any suggestions for improvement..."
                                             className="min-h-24"
                                             rows={3}
@@ -332,8 +309,7 @@ export default function GuestBookCreate() {
                                         <input
                                             type="checkbox"
                                             name="would_recommend"
-                                            checked={data.would_recommend}
-                                            onChange={(e) => setData('would_recommend', e.target.checked)}
+                                            value="1"
                                             className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
                                         />
                                         <div>
