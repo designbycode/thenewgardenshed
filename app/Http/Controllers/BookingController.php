@@ -31,6 +31,6 @@ class BookingController extends Controller
 
         session()->flash('toast', ['type' => 'success', 'message' => 'Your booking request has been submitted successfully.']);
 
-        return redirect()->back()->with('booking_success', 'Your booking request has been submitted successfully.');
+        return redirect()->route('rooms.show', $room)->with('booking_success', 'Your booking request has been submitted successfully.');
     }
 }
