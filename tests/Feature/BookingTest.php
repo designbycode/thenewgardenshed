@@ -214,4 +214,47 @@ class BookingTest extends TestCase
         $response->assertStatus(302);
         $this->assertEquals('confirmed', $booking->fresh()->status);
     }
+
+    public function test_booking_create_page_loads(): void
+    {
+        Room::factory()->count(3)->create(['is_active' => true]);
+
+        $response = $this->get(route('booking.create'));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->component('booking/create')
+            ->has('rooms', 3)
+        );
+    }
+
+    public function test_booking_create_page_pre_selects_room(): void
+    {
+        $room = Room::factory()->create(['is_active' => true]);
+
+        $response = $this->get(route('booking.create', ['room_id' => $room->id]));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page
+            ->component('booking/create')
+            ->where('preselectedRoomId', $room->id)
+        );
+    }
+
+    public function test_booking_stores_redirects_to_room_show(): void
+    {
+        $room = Room::factory()->create(['price_per_night' => 1000]);
+
+        $response = $this->post(route('bookings.store'), [
+            'room_id' => $room->id,
+            'name' => 'Redirect Test',
+            'email' => 'redirect@example.com',
+            'check_in' => now()->addDay()->format('Y-m-d'),
+            'check_out' => now()->addDays(3)->format('Y-m-d'),
+            'guests' => 2,
+        ]);
+
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect(route('rooms.show', $room));
+    }
 }
