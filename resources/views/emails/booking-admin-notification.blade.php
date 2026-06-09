@@ -12,6 +12,9 @@
 **Check-in:** {{ $booking->check_in->toFormattedDateString() }}
 **Check-out:** {{ $booking->check_out->toFormattedDateString() }}
 **Guests:** {{ $booking->guests }}
+@if($booking->notes)
+**Notes:** {{ $booking->notes }}
+@endif
 **Total:** R {{ number_format($booking->total_price, 2) }}
 **Status:** {{ ucfirst($booking->status) }}
 
