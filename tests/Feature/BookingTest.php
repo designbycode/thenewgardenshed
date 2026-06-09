@@ -5,10 +5,7 @@ namespace Tests\Feature;
 use App\Models\Room;
 use App\Models\User;
 use App\Models\Booking;
-use App\Mail\ClientBookingNotification;
-use App\Mail\AdminBookingNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class BookingTest extends TestCase
@@ -135,6 +132,23 @@ class BookingTest extends TestCase
 
         $response->assertStatus(302);
         $this->assertDatabaseHas('bookings', ['email' => 'small@example.com']);
+    }
+
+    public function test_booking_creation_sends_notification_emails(): void
+    {
+        $room = Room::factory()->create(['price_per_night' => 1000]);
+
+        $response = $this->post(route('bookings.store'), [
+            'room_id' => $room->id,
+            'name' => 'Mail Test',
+            'email' => 'mailtest@example.com',
+            'check_in' => now()->addDay()->format('Y-m-d'),
+            'check_out' => now()->addDays(3)->format('Y-m-d'),
+            'guests' => 2,
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertDatabaseHas('bookings', ['email' => 'mailtest@example.com']);
     }
 
     public function test_admin_can_update_booking_status(): void
