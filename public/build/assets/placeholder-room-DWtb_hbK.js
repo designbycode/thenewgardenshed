@@ -1,0 +1,1 @@
+var e=`/build/assets/placeholder-room-DlY31dnn.png`;export{e as t};

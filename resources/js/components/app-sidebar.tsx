@@ -1,5 +1,12 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, DoorOpen, FolderGit2, LayoutGrid, Calendar, MessageSquare } from 'lucide-react';
+import {
+    BookOpen,
+    Calendar,
+    DoorOpen,
+    FolderGit2,
+    LayoutGrid,
+    MessageSquare,
+} from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -48,12 +55,12 @@ const mainNavItems: NavItem[] = [
 const footerNavItems: NavItem[] = [
     {
         title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
+        href: 'https://github.com/designbycode/thegardenshed',
         icon: FolderGit2,
     },
     {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
+        title: 'DesignByCode',
+        href: 'https://designbycode.co.za',
         icon: BookOpen,
     },
 ];
