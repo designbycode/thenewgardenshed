@@ -46,13 +46,17 @@ class BookingController extends Controller
 
         $booking->update($validated);
 
-        return redirect()->back()->with('success', 'Booking status updated successfully.');
+        session()->flash('toast', ['type' => 'success', 'message' => 'Booking status updated successfully.']);
+
+        return redirect()->back();
     }
 
     public function destroy(Booking $booking): RedirectResponse
     {
         $booking->delete();
 
-        return redirect()->route('admin.bookings.index')->with('success', 'Booking deleted successfully.');
+        session()->flash('toast', ['type' => 'success', 'message' => 'Booking deleted successfully.']);
+
+        return redirect()->route('admin.bookings.index');
     }
 }

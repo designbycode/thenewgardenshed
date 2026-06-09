@@ -33,20 +33,26 @@ class ReviewController extends Controller
     {
         $review->update(['is_approved' => true]);
 
-        return redirect()->back()->with('success', 'Review approved successfully.');
+        session()->flash('toast', ['type' => 'success', 'message' => 'Review approved successfully.']);
+
+        return redirect()->back();
     }
 
     public function reject(Review $review): RedirectResponse
     {
         $review->update(['is_approved' => false]);
 
-        return redirect()->back()->with('success', 'Review rejected successfully.');
+        session()->flash('toast', ['type' => 'success', 'message' => 'Review rejected successfully.']);
+
+        return redirect()->back();
     }
 
     public function destroy(Review $review): RedirectResponse
     {
         $review->delete();
 
-        return redirect()->back()->with('success', 'Review deleted successfully.');
+        session()->flash('toast', ['type' => 'success', 'message' => 'Review deleted successfully.']);
+
+        return redirect()->back();
     }
 }
