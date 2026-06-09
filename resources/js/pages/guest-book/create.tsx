@@ -244,7 +244,8 @@ export default function GuestBookCreate() {
                                         <input
                                             type="checkbox"
                                             name="would_recommend"
-                                            value="1"
+                                            checked={store.form().data.would_recommend}
+                                            onChange={(e) => store.form().setData('would_recommend', e.target.checked)}
                                             className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
                                         />
                                         <div>
