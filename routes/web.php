@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Booking\BookingCreateController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ContactUs\ContactUsIndexController;
 use App\Http\Controllers\ContactUs\ContactUsStoreController;
@@ -23,6 +24,7 @@ Route::get('/contact-us', ContactUsIndexController::class)->name('contact-us.ind
 Route::post('/contact-us', ContactUsStoreController::class)->name('contact-us.store');
 
 Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store')->middleware('booking.enabled');
+Route::get('/booking', BookingCreateController::class)->name('booking.create');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
