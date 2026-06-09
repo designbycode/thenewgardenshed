@@ -26,6 +26,7 @@ class RoomsShowController extends Controller
                 'shortDescription' => $room->short_description,
                 'pricePerNight' => (int)$room->price_per_night,
                 'capacity' => (int)$room->capacity,
+                'maxGuests' => (int)$room->max_guests,
                 'bedType' => $room->bed_type,
                 'bathroomType' => $room->bathroom_type,
                 'imageUrl' => $room->getFirstMediaUrl('images', 'large') ?: null,

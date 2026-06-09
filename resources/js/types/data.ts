@@ -7,6 +7,7 @@ export interface RoomItem {
     shortDescription: string;
     pricePerNight: number;
     capacity: number;
+    maxGuests: number;
     bedType: string;
     bathroomType: string;
     thumbnail?: string | null;
