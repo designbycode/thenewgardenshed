@@ -151,6 +151,45 @@ class BookingTest extends TestCase
         $this->assertDatabaseHas('bookings', ['email' => 'mailtest@example.com']);
     }
 
+    public function test_booking_rejects_notes_exceeding_max_length(): void
+    {
+        $room = Room::factory()->create(['price_per_night' => 1000]);
+
+        $response = $this->post(route('bookings.store'), [
+            'room_id' => $room->id,
+            'name' => 'Notes Test',
+            'email' => 'notes@example.com',
+            'check_in' => now()->addDay()->format('Y-m-d'),
+            'check_out' => now()->addDays(3)->format('Y-m-d'),
+            'guests' => 2,
+            'notes' => str_repeat('a', 1001),
+        ]);
+
+        $response->assertSessionHasErrors(['notes']);
+    }
+
+    public function test_booking_succeeds_with_valid_notes(): void
+    {
+        config(['app.booking_system_enabled' => true]);
+        $room = Room::factory()->create(['price_per_night' => 1000]);
+
+        $response = $this->post(route('bookings.store'), [
+            'room_id' => $room->id,
+            'name' => 'Notes Test',
+            'email' => 'notes@example.com',
+            'check_in' => now()->addDay()->format('Y-m-d'),
+            'check_out' => now()->addDays(3)->format('Y-m-d'),
+            'guests' => 2,
+            'notes' => 'Please provide a hypoallergenic pillow.',
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertDatabaseHas('bookings', [
+            'email' => 'notes@example.com',
+            'notes' => 'Please provide a hypoallergenic pillow.',
+        ]);
+    }
+
     public function test_admin_can_update_booking_status(): void
     {
         $user = User::factory()->create();
