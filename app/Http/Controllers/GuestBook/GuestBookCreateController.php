@@ -5,6 +5,7 @@ namespace App\Http\Controllers\GuestBook;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GuestBook\ReviewRequest;
 use App\Models\Review;
+use App\Models\Room;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,6 +17,7 @@ class GuestBookCreateController extends Controller
     {
         return Inertia::render('guest-book/create', [
             'review_authenticated' => $request->session()->get('review_authenticated', false),
+            'rooms' => Room::active()->pluck('name')->toArray(),
         ]);
     }
 
@@ -36,6 +38,9 @@ class GuestBookCreateController extends Controller
 
         $request->session()->forget('review_authenticated');
 
-        return redirect()->back()->with('review_created', true);
+        return redirect()->back()->with('review_created', true)->with('toast', [
+            'type' => 'success',
+            'message' => 'Your review has been submitted successfully!',
+        ]);
     }
 }

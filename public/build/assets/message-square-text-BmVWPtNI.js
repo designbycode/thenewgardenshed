@@ -1,1 +1,0 @@
-import{F as e}from"./app-EUem4Jy2.js";var t=e(`MessageCircle`,[[`path`,{d:`M7.9 20A9 9 0 1 0 4 16.1L2 22Z`,key:`vv11sd`}]]),n=e(`MessageSquareText`,[[`path`,{d:`M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z`,key:`1lielz`}],[`path`,{d:`M13 8H7`,key:`14i4kc`}],[`path`,{d:`M17 12H7`,key:`16if0g`}]]);export{t as n,n as t};

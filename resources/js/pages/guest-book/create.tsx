@@ -1,7 +1,9 @@
 import { Form, usePage } from '@inertiajs/react';
 import type { PageProps } from '@inertiajs/core';
 import {
+    Check,
     CheckCircle,
+    ChevronsUpDown,
     LoaderCircle,
     Lock,
     MessageCircle,
@@ -10,7 +12,8 @@ import {
     Star,
     ThumbsUp,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -22,6 +25,20 @@ import {
 import { Input } from '@/components/ui/input';
 import InputError from '@/components/input-error';
 import { Label } from '@/components/ui/label';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from '@/components/ui/command';
+import { Calendar } from '@/components/ui/calendar';
 import { Textarea } from '@/components/ui/textarea';
 import HeadingBlock from '@/components/typography/heading-block';
 import MainWrapper from '@/layouts/main/main-wrapper';
@@ -30,10 +47,53 @@ import { create, store } from '@/routes/guest-book';
 
 interface CreatePageProps extends PageProps {
     review_authenticated: boolean;
+    rooms: string[];
     flash: {
         review_created?: boolean;
     } & PageProps['flash'];
 }
+
+const COUNTRIES = [
+    'South Africa',
+    'Botswana',
+    'Eswatini',
+    'Lesotho',
+    'Namibia',
+    'Zimbabwe',
+    'Angola',
+    'Kenya',
+    'Mozambique',
+    'Tanzania',
+    'Zambia',
+    'Nigeria',
+    'Ghana',
+    'Rwanda',
+    'Mauritius',
+    'Seychelles',
+    'United Kingdom',
+    'Germany',
+    'France',
+    'Netherlands',
+    'Belgium',
+    'Switzerland',
+    'Austria',
+    'Italy',
+    'Spain',
+    'Portugal',
+    'Sweden',
+    'Norway',
+    'Denmark',
+    'United States',
+    'Canada',
+    'Australia',
+    'New Zealand',
+    'China',
+    'Japan',
+    'India',
+    'Brazil',
+    'Argentina',
+    'Other',
+];
 
 const RATING_CATEGORIES = [
     { key: 'overall_rating', label: 'Overall' },
@@ -82,9 +142,19 @@ function StarSelect({ name, label, error }: { name: string; label: string; error
 }
 
 export default function GuestBookCreate() {
-    const { review_authenticated, flash } = usePage<CreatePageProps>().props;
+    const { review_authenticated, rooms, flash } = usePage<CreatePageProps>().props;
     const [passwordDialogOpen, setPasswordDialogOpen] = useState(!review_authenticated);
-    const [successDialogOpen, setSuccessDialogOpen] = useState(!!flash?.review_created);
+    const [countryOpen, setCountryOpen] = useState(false);
+    const [country, setCountry] = useState('');
+    const [roomOpen, setRoomOpen] = useState(false);
+
+    useEffect(() => {
+        if (flash?.review_created) {
+            toast.success('Your review has been submitted successfully!');
+        }
+    }, [flash?.review_created]);
+    const [roomNumber, setRoomNumber] = useState('');
+    const [stayDate, setStayDate] = useState<Date>(new Date());
     const [ratings, setRatings] = useState<Record<string, number>>({
         overall_rating: 0,
         cleanliness_rating: 0,
@@ -159,7 +229,7 @@ export default function GuestBookCreate() {
                 </DialogContent>
             </Dialog>
 
-            {review_authenticated && (
+            {review_authenticated && !flash?.review_created && (
                 <div className="mx-auto max-w-2xl">
                     <div className="rounded-2xl border border-border bg-card p-6 shadow-md sm:p-8">
                         <h3 className="mb-6 border-b border-border pb-3 font-serif text-xl font-normal text-foreground">
@@ -202,27 +272,95 @@ export default function GuestBookCreate() {
 
                                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                         <div className="space-y-1.5">
-                                            <Label htmlFor="country" className="text-xs font-semibold text-muted-foreground">
+                                            <Label className="text-xs font-semibold text-muted-foreground">
                                                 Country
                                             </Label>
-                                            <Input
-                                                type="text"
-                                                id="country"
-                                                name="country"
-                                                placeholder="e.g. South Africa"
-                                            />
+                                            <Popover open={countryOpen} onOpenChange={setCountryOpen}>
+                                                <PopoverTrigger asChild>
+                                                    <button
+                                                        type="button"
+                                                        role="combobox"
+                                                        aria-expanded={countryOpen}
+                                                        className="border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 cursor-pointer items-center justify-between rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] md:text-sm dark:bg-input/30"
+                                                    >
+                                                        {country || <span className="text-muted-foreground">Select your country</span>}
+                                                        <ChevronsUpDown size={14} className="ml-2 shrink-0 opacity-50" />
+                                                    </button>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
+                                                    <Command>
+                                                        <CommandInput placeholder="Search countries..." />
+                                                        <CommandList>
+                                                            <CommandEmpty>No country found.</CommandEmpty>
+                                                            <CommandGroup>
+                                                                {COUNTRIES.map((c) => (
+                                                                    <CommandItem
+                                                                        key={c}
+                                                                        value={c}
+                                                                        onSelect={(currentValue) => {
+                                                                            setCountry(currentValue === country ? '' : currentValue);
+                                                                            setCountryOpen(false);
+                                                                        }}
+                                                                    >
+                                                                        <Check
+                                                                            size={14}
+                                                                            className={country === c ? 'opacity-100' : 'opacity-0'}
+                                                                        />
+                                                                        {c}
+                                                                    </CommandItem>
+                                                                ))}
+                                                            </CommandGroup>
+                                                        </CommandList>
+                                                    </Command>
+                                                </PopoverContent>
+                                            </Popover>
+                                            <input type="hidden" name="country" value={country} />
                                             <InputError message={errors.country} />
                                         </div>
                                         <div className="space-y-1.5">
-                                            <Label htmlFor="room_number" className="text-xs font-semibold text-muted-foreground">
+                                            <Label className="text-xs font-semibold text-muted-foreground">
                                                 Room / Suite
                                             </Label>
-                                            <Input
-                                                type="text"
-                                                id="room_number"
-                                                name="room_number"
-                                                placeholder="e.g. Suite 3"
-                                            />
+                                            <Popover open={roomOpen} onOpenChange={setRoomOpen}>
+                                                <PopoverTrigger asChild>
+                                                    <button
+                                                        type="button"
+                                                        role="combobox"
+                                                        aria-expanded={roomOpen}
+                                                        className="border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 cursor-pointer items-center justify-between rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] md:text-sm dark:bg-input/30"
+                                                    >
+                                                        {roomNumber || <span className="text-muted-foreground">Select your room</span>}
+                                                        <ChevronsUpDown size={14} className="ml-2 shrink-0 opacity-50" />
+                                                    </button>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="p-0" style={{ width: 'var(--radix-popover-trigger-width)' }}>
+                                                    <Command>
+                                                        <CommandInput placeholder="Search rooms..." />
+                                                        <CommandList>
+                                                            <CommandEmpty>No room found.</CommandEmpty>
+                                                            <CommandGroup>
+                                                                {rooms.map((r) => (
+                                                                    <CommandItem
+                                                                        key={r}
+                                                                        value={r}
+                                                                        onSelect={(currentValue) => {
+                                                                            setRoomNumber(currentValue === roomNumber ? '' : currentValue);
+                                                                            setRoomOpen(false);
+                                                                        }}
+                                                                    >
+                                                                        <Check
+                                                                            size={14}
+                                                                            className={roomNumber === r ? 'opacity-100' : 'opacity-0'}
+                                                                        />
+                                                                        {r}
+                                                                    </CommandItem>
+                                                                ))}
+                                                            </CommandGroup>
+                                                        </CommandList>
+                                                    </Command>
+                                                </PopoverContent>
+                                            </Popover>
+                                            <input type="hidden" name="room_number" value={roomNumber} />
                                             <InputError message={errors.room_number} />
                                         </div>
                                     </div>
@@ -231,12 +369,28 @@ export default function GuestBookCreate() {
                                         <Label htmlFor="stay_date" className="text-xs font-semibold text-muted-foreground">
                                             Stay Date
                                         </Label>
-                                        <Input
-                                            type="text"
-                                            id="stay_date"
-                                            name="stay_date"
-                                            placeholder="e.g. June 2026"
-                                        />
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <button
+                                                    type="button"
+                                                    id="stay_date"
+                                                    className="border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 cursor-pointer items-center rounded-md border bg-transparent px-3 py-1 text-left text-base shadow-xs transition-[color,box-shadow] md:text-sm dark:bg-input/30"
+                                                >
+                                                    {stayDate.toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                                </button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="start">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={stayDate}
+                                                    onSelect={(date) => date && setStayDate(date)}
+                                                    captionLayout="dropdown"
+                                                    startMonth={new Date(2020, 0)}
+                                                    endMonth={new Date(2030, 11)}
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                        <input type="hidden" name="stay_date" value={stayDate.toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' })} />
                                         <InputError message={errors.stay_date} />
                                     </div>
 
@@ -306,10 +460,12 @@ export default function GuestBookCreate() {
                                     </div>
 
                                     <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-muted/30 p-4 transition-colors hover:bg-muted/50">
+                                        <input type="hidden" name="would_recommend" value="0" />
                                         <input
                                             type="checkbox"
                                             name="would_recommend"
                                             value="1"
+                                            defaultChecked
                                             className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
                                         />
                                         <div>
@@ -341,40 +497,29 @@ export default function GuestBookCreate() {
                 </div>
             )}
 
-            <Dialog
-                open={successDialogOpen}
-                onOpenChange={(open) => {
-                    setSuccessDialogOpen(open);
-                    if (!open) {
-                        window.location.href = create.url();
-                    }
-                }}
-            >
-                <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                        <div className="mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+            {flash?.review_created && (
+                <div className="mx-auto max-w-2xl text-center">
+                    <div className="rounded-2xl border border-border bg-card p-8 shadow-md">
+                        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
                             <CheckCircle size={32} className="text-primary" />
                         </div>
-                        <DialogTitle className="text-center text-xl">
+                        <h3 className="mb-2 font-serif text-xl font-normal text-foreground">
                             Thank You!
-                        </DialogTitle>
-                        <DialogDescription className="text-center">
+                        </h3>
+                        <p className="mb-6 text-muted-foreground">
                             Your review has been submitted successfully. It will appear on our
                             guest wall after moderation.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <Button
-                        onClick={() => {
-                            setSuccessDialogOpen(false);
-                            window.location.href = create.url();
-                        }}
-                        className="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary py-5.5 text-xs font-semibold tracking-widest text-primary-foreground uppercase transition-colors hover:bg-primary/90"
-                    >
-                        <MessageSquareText size={14} />
-                        <span>Write Another Review</span>
-                    </Button>
-                </DialogContent>
-            </Dialog>
+                        </p>
+                        <Button
+                            onClick={() => { window.location.href = create.url(); }}
+                            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary py-5.5 text-xs font-semibold tracking-widest text-primary-foreground uppercase transition-colors hover:bg-primary/90"
+                        >
+                            <MessageSquareText size={14} />
+                            <span>Write Another Review</span>
+                        </Button>
+                    </div>
+                </div>
+            )}
         </MainWrapper>
     );
 }

@@ -4,6 +4,7 @@ use App\Http\Controllers\Booking\BookingCreateController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ContactUs\ContactUsIndexController;
 use App\Http\Controllers\ContactUs\ContactUsStoreController;
+use App\Http\Controllers\Dashboard\DashBoardIndexController;
 use App\Http\Controllers\Facilities\FacilitiesIndexController;
 use App\Http\Controllers\GuestBook\GuestBookCreateController;
 use App\Http\Controllers\GuestBook\GuestBookIndexController;
@@ -27,8 +28,8 @@ Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.st
 Route::get('/booking', BookingCreateController::class)->name('booking.create');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::get('dashboard', DashBoardIndexController::class)->name('dashboard');
 });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/admin.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/admin.php';
