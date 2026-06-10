@@ -19,6 +19,34 @@ export interface RoomItem {
     bookings?: { check_in: string; check_out: string }[];
 }
 
+export interface MonthlyBooking {
+    month: string;
+    count: number;
+    revenue: number;
+}
+
+export interface MonthlyReview {
+    month: string;
+    count: number;
+}
+
+export interface BookingStats {
+    total_bookings: number;
+    revenue: number;
+    avg_per_booking: number;
+    bookings_per_month: MonthlyBooking[];
+}
+
+export interface DashboardStats {
+    bookings: BookingStats;
+    reviews: {
+        total_reviews: number;
+        pending_reviews: number;
+        avg_rating: number;
+        reviews_per_month: MonthlyReview[];
+    };
+}
+
 export interface AmenityItem {
     id: number;
     slug: string;
