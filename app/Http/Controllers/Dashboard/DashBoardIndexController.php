@@ -17,13 +17,17 @@ class DashBoardIndexController extends Controller
     {
         $lastYear = Carbon::now()->subYear();
 
+        $dateFormat = DB::getDriverName() === 'sqlite'
+            ? "strftime('%Y-%m', created_at)"
+            : "DATE_FORMAT(created_at, '%Y-%m')";
+
         $bookingsPerMonth = Booking::select(
-            DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
+            DB::raw("{$dateFormat} as month"),
             DB::raw('COUNT(*) as count'),
             DB::raw("COALESCE(SUM(CASE WHEN status = 'confirmed' THEN total_price ELSE 0 END), 0) as revenue"),
         )
             ->where('created_at', '>=', $lastYear)
-            ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y-%m')"))
+            ->groupBy(DB::raw($dateFormat))
             ->orderBy('month')
             ->get()
             ->map(fn ($row) => [
@@ -39,11 +43,11 @@ class DashBoardIndexController extends Controller
         )->first();
 
         $reviewsPerMonth = Review::select(
-            DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
+            DB::raw("{$dateFormat} as month"),
             DB::raw('COUNT(*) as count'),
         )
             ->where('created_at', '>=', $lastYear)
-            ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y-%m')"))
+            ->groupBy(DB::raw($dateFormat))
             ->orderBy('month')
             ->get()
             ->map(fn ($row) => [
